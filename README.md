@@ -4,7 +4,6 @@
 
 ![CivicPulse](https://img.shields.io/badge/CivicPulse-v2.5.0-D4A017?style=flat-square)
 ![Status](https://img.shields.io/badge/status-live-22C55E?style=flat-square)
-![Built with](https://img.shields.io/badge/built%20with-Claude%20AI-blue?style=flat-square)
 
 ---
 
