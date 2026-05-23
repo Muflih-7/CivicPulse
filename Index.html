@@ -1,0 +1,3751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CivicPulse AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+/* ════════════════════════════════
+   TOKENS
+════════════════════════════════ */
+:root {
+  --bg:       #0A0A0A;
+  --bg2:      #111111;
+  --bg3:      #181818;
+  --bg4:      #202020;
+  --border:   #2A2A2A;
+  --border2:  #383838;
+  --gold:     #D4A017;
+  --gold2:    #F5C842;
+  --gold3:    #FFF0A0;
+  --goldbg:   rgba(212,160,23,0.08);
+  --goldbg2:  rgba(212,160,23,0.15);
+  --text:     #F0F0F0;
+  --text2:    #B8B8B8;
+  --text3:    #787878;
+  --red:      #E5383B;
+  --redbg:    rgba(229,56,59,0.1);
+  --orange:   #F4722B;
+  --orangebg: rgba(244,114,43,0.1);
+  --amber:    #D4A017;
+  --green:    #2ECC71;
+  --greenbg:  rgba(46,204,113,0.08);
+  --blue:     #4A9EFF;
+  --f-head:   'Bebas Neue', sans-serif;
+  --f-ui:     'Space Grotesk', sans-serif;
+  --f-mono:   'Space Mono', monospace;
+}
+
+/* ════════════════════════════════
+   PARCHMENT THEME (light)
+════════════════════════════════ */
+body.parchment {
+  --bg:       #F0EBE0;
+  --bg2:      #E8E2D4;
+  --bg3:      #DDD7C8;
+  --bg4:      #D4CEB8;
+  --border:   #C8C2B0;
+  --border2:  #B0AA96;
+  --gold:     #8B5E0A;
+  --gold2:    #A67210;
+  --gold3:    #6B4A08;
+  --goldbg:   rgba(139,94,10,0.1);
+  --goldbg2:  rgba(139,94,10,0.18);
+  --text:     #1A1814;
+  --text2:    #3A3628;
+  --text3:    #6B6454;
+  --red:      #C0121A;
+  --redbg:    rgba(192,18,26,0.08);
+  --orange:   #B84A10;
+  --orangebg: rgba(184,74,16,0.08);
+  --green:    #1A7A3C;
+  --greenbg:  rgba(26,122,60,0.08);
+  --blue:     #1A5FAA;
+}
+
+/* keep sidebar dark in parchment */
+body.parchment .sidebar {
+  background: #1A1814;
+  border-right-color: #8B5E0A;
+}
+body.parchment .sb-btn       { color: #6B6454; }
+body.parchment .sb-btn:hover  { background: #2E2A20; color: #C8C2B0; }
+body.parchment .sb-btn.on     { background: rgba(139,94,10,0.25); color: #D4A017; }
+body.parchment .sb-btn.on::before { background: #D4A017; }
+body.parchment .sb-live       { background: #2ECC71; }
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; background:var(--bg); color:var(--text); font-family:var(--f-ui); overflow:hidden; transition: background 0.35s, color 0.35s; }
+
+/* scrollbar */
+::-webkit-scrollbar { width:3px; height:3px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+
+/* ════════════════════════════════
+   WELCOME SCREEN
+════════════════════════════════ */
+#welcome {
+  position:fixed; inset:0; z-index:9000;
+  background:#000;
+  display:flex; align-items:center; justify-content:center;
+  transition:opacity 0.6s ease;
+}
+
+#welcome.out { opacity:0; pointer-events:none; }
+
+.w-inner {
+  text-align:center;
+  padding:0 24px;
+  max-width:600px;
+  width:100%;
+}
+
+.w-emblem {
+  width:72px; height:72px;
+  border:2px solid var(--gold);
+  margin:0 auto 28px;
+  display:flex; align-items:center; justify-content:center;
+  position:relative;
+}
+
+.w-emblem::before {
+  content:'';
+  position:absolute; inset:-8px;
+  border:1px solid rgba(212,160,23,0.2);
+}
+
+.w-emblem svg { width:38px; height:38px; }
+
+.w-eyebrow {
+  font-family: var(--f-mono);
+  font-size:10px;
+  letter-spacing:0.25em;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin-bottom:16px;
+}
+
+.w-title {
+  font-family:var(--f-head);
+  font-size:clamp(56px,10vw,96px);
+  letter-spacing:0.04em;
+  line-height:0.9;
+  color:var(--text);
+  margin-bottom:6px;
+}
+
+.w-title em { color:var(--gold); font-style:normal; }
+
+.w-sub {
+  font-family:var(--f-mono);
+  font-size:11px;
+  letter-spacing:0.12em;
+  color:var(--text3);
+  text-transform:uppercase;
+  margin-bottom:40px;
+}
+
+.w-line {
+  width:60px; height:1px;
+  background:var(--gold);
+  margin:0 auto 32px;
+}
+
+.w-desc {
+  font-size:15px;
+  line-height:1.75;
+  color:var(--text2);
+  margin-bottom:40px;
+}
+
+.w-desc strong { color:var(--text); font-weight:600; }
+
+.w-stats {
+  display:flex;
+  justify-content:center;
+  gap:48px;
+  margin-bottom:48px;
+}
+
+.w-stat-n {
+  font-family:var(--f-head);
+  font-size:44px;
+  color:var(--gold);
+  line-height:1;
+}
+
+.w-stat-l {
+  font-family:var(--f-mono);
+  font-size:9px;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--text3);
+  margin-top:5px;
+}
+
+.w-cta {
+  display:inline-block;
+  padding:15px 48px;
+  background:var(--gold);
+  color:#000;
+  font-family:var(--f-head);
+  font-size:20px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  border:none;
+  cursor:pointer;
+  transition:all 0.2s;
+  margin-bottom:14px;
+}
+
+.w-cta:hover { background:var(--gold2); transform:translateY(-2px); }
+
+.w-sim-link {
+  display:block;
+  font-family:var(--f-mono);
+  font-size:10px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--text3);
+  cursor:pointer;
+  transition:color 0.15s;
+  margin-top:6px;
+}
+
+.w-sim-link:hover { color:var(--gold); }
+
+.w-credit {
+  position:absolute;
+  bottom:24px;
+  left:50%;
+  transform:translateX(-50%);
+  font-family:var(--f-mono);
+  font-size:9px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--text3);
+  white-space:nowrap;
+}
+
+/* ════════════════════════════════
+   APP SHELL
+════════════════════════════════ */
+#app {
+  position:fixed; inset:0;
+  display:grid;
+  grid-template-columns:52px 1fr;
+  grid-template-rows:48px 28px 1fr;
+  opacity:0;
+  transition:opacity 0.5s ease 0.2s;
+  pointer-events:none;
+}
+
+#app.visible { opacity:1; pointer-events:all; }
+
+/* ════════════════════════════════
+   SIDEBAR
+════════════════════════════════ */
+.sidebar {
+  grid-row:1/-1;
+  background:var(--bg2);
+  border-right:1px solid var(--border);
+  display:flex; flex-direction:column;
+  align-items:center;
+  padding:12px 0;
+  gap:2px;
+  z-index:100;
+}
+
+.sb-logo {
+  width:32px; height:32px;
+  background:var(--gold);
+  display:flex; align-items:center; justify-content:center;
+  margin-bottom:20px;
+  flex-shrink:0;
+}
+
+.sb-logo svg { width:20px; height:20px; }
+
+.sb-btn {
+  width:38px; height:38px;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:6px;
+  border:none;
+  background:transparent;
+  color:var(--text3);
+  cursor:pointer;
+  transition:all 0.15s;
+  position:relative;
+  flex-shrink:0;
+}
+
+.sb-btn:hover { background:var(--bg3); color:var(--text2); }
+
+.sb-btn.on {
+  background:var(--goldbg2);
+  color:var(--gold);
+}
+
+.sb-btn.on::before {
+  content:'';
+  position:absolute;
+  left:0; top:8px; bottom:8px;
+  width:2px;
+  background:var(--gold);
+  border-radius:0 2px 2px 0;
+}
+
+.sb-sep { width:24px; height:1px; background:var(--border); margin:4px 0; flex-shrink:0; }
+.sb-space { flex:1; }
+
+.sb-live {
+  width:8px; height:8px;
+  border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 8px var(--green);
+  animation:sbpulse 2s ease-in-out infinite;
+  flex-shrink:0;
+  margin-bottom:8px;
+}
+
+@keyframes sbpulse {
+  0%,100% { box-shadow:0 0 8px var(--green); }
+  50%      { box-shadow:0 0 16px var(--green); }
+}
+
+/* ════════════════════════════════
+   TOPBAR
+════════════════════════════════ */
+.topbar {
+  grid-column:2;
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center;
+  padding:0 16px 0 0;
+  gap:0;
+  overflow:hidden;
+}
+
+.tb-brand {
+  height:100%;
+  padding:0 20px;
+  background:var(--gold);
+  display:flex; align-items:center; gap:10px;
+  border-right:1px solid rgba(0,0,0,0.2);
+  flex-shrink:0;
+}
+
+.tb-brand-name {
+  font-family:var(--f-head);
+  font-size:22px;
+  letter-spacing:0.06em;
+  color:#000;
+  line-height:1;
+}
+
+.tb-brand-ver {
+  font-family:var(--f-mono);
+  font-size:8px;
+  color:rgba(0,0,0,0.5);
+  letter-spacing:0.08em;
+}
+
+.tb-pill {
+  display:flex; align-items:center; gap:6px;
+  padding:0 16px;
+  height:100%;
+  border-right:1px solid var(--border);
+  font-family:var(--f-mono);
+  font-size:9px;
+  letter-spacing:0.08em;
+  flex-shrink:0;
+}
+
+.tb-dot {
+  width:5px; height:5px;
+  border-radius:50%;
+}
+
+.tb-dot.green  { background:var(--green); box-shadow:0 0 5px var(--green); animation:blink 2s ease-in-out infinite; }
+.tb-dot.gold   { background:var(--gold);  animation:blink 1.4s ease-in-out infinite; }
+.tb-dot.red    { background:var(--red);   box-shadow:0 0 5px var(--red); animation:blink 0.9s ease-in-out infinite; }
+
+@keyframes blink { 50% { opacity:0.25; } }
+
+.tb-pill.ok   { color:var(--text3); }
+.tb-pill.warn { color:var(--gold); }
+.tb-pill.crit { color:var(--red); }
+
+.tb-right { margin-left:auto; display:flex; align-items:center; gap:8px; }
+
+.tb-btn {
+  height:30px; padding:0 12px;
+  background:transparent;
+  border:1px solid var(--border2);
+  color:var(--text3);
+  font-family:var(--f-mono);
+  font-size:9px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  cursor:pointer;
+  border-radius:4px;
+  transition:all 0.15s;
+  white-space:nowrap;
+}
+
+.tb-btn:hover { border-color:var(--gold); color:var(--gold); background:var(--goldbg); }
+.tb-btn.gold  { border-color:var(--gold); color:var(--gold); }
+.tb-btn.gold:hover { background:var(--goldbg2); }
+.tb-btn.sim-run { border-color:var(--green); color:var(--green); animation:simPulse 1s ease-in-out infinite; }
+@keyframes simPulse { 50% { opacity:0.5; } }
+
+.tb-clock {
+  padding-left:16px;
+  border-left:1px solid var(--border);
+  text-align:right;
+}
+
+.tb-time {
+  font-family:var(--f-mono);
+  font-size:14px;
+  color:var(--gold);
+  letter-spacing:0.06em;
+  line-height:1;
+}
+
+.tb-date {
+  font-family:var(--f-mono);
+  font-size:8px;
+  color:var(--text3);
+  letter-spacing:0.06em;
+  margin-top:2px;
+}
+
+/* ════════════════════════════════
+   VIEWS
+════════════════════════════════ */
+.views {
+  grid-column:2;
+  grid-row:3;
+  position:relative;
+  overflow:hidden;
+}
+
+.view {
+  position:absolute; inset:0;
+  display:none;
+  overflow:hidden;
+}
+
+.view.on { display:flex; flex-direction:column; }
+
+/* ════════════════════════════════
+   COMMAND VIEW
+════════════════════════════════ */
+#v-command { flex-direction:row !important; }
+
+/* ─ stat strip ─ */
+.stat-strip {
+  position:absolute;
+  top:0; left:0; right:0;
+  height:68px;
+  display:flex;
+  border-bottom:1px solid var(--border);
+  z-index:5;
+  background:var(--bg2);
+}
+
+.stat {
+  flex:1;
+  padding:10px 16px;
+  border-right:1px solid var(--border);
+  cursor:default;
+  transition:background 0.15s;
+}
+
+.stat:last-child { border-right:none; }
+.stat:hover { background:var(--bg3); }
+
+.stat-l {
+  font-family:var(--f-mono);
+  font-size:9px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--text3);
+  margin-bottom:6px;
+}
+
+.stat-n {
+  font-family:var(--f-head);
+  font-size:30px;
+  line-height:1;
+  letter-spacing:0.02em;
+}
+
+.stat-d {
+  font-family:var(--f-mono);
+  font-size:9px;
+  color:var(--text3);
+  margin-top:3px;
+}
+
+.n-red    { color:var(--red); }
+.n-orange { color:var(--orange); }
+.n-gold   { color:var(--gold); }
+.n-green  { color:var(--green); }
+.n-blue   { color:var(--blue); }
+.n-text   { color:var(--text); }
+
+/* ─ cols under stat strip ─ */
+.cmd-body {
+  position:absolute;
+  inset:0;
+  top:68px;
+  display:grid;
+  grid-template-columns:272px 1fr 260px;
+  overflow:hidden;
+}
+
+.col {
+  display:flex; flex-direction:column;
+  overflow:hidden;
+  border-right:1px solid var(--border);
+}
+
+.col:last-child { border-right:none; }
+
+.col-head {
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  background:var(--bg2);
+  display:flex; align-items:center; justify-content:space-between;
+  flex-shrink:0;
+}
+
+.col-title {
+  font-family:var(--f-mono);
+  font-size:9px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--text3);
+}
+
+.col-badge {
+  font-family:var(--f-mono);
+  font-size:9px;
+  background:var(--goldbg2);
+  color:var(--gold);
+  padding:2px 8px;
+  border-radius:10px;
+  letter-spacing:0.04em;
+}
+
+.col-scroll {
+  flex:1;
+  overflow-y:auto;
+}
+
+/* ─ incident cards ─ */
+.inc {
+  padding:12px 14px;
+  border-bottom:1px solid var(--border);
+  cursor:pointer;
+  transition:background 0.12s;
+  position:relative;
+}
+
+.inc::before {
+  content:'';
+  position:absolute;
+  left:0; top:0; bottom:0;
+  width:2px;
+}
+
+.inc.s1::before { background:var(--red); }
+.inc.s2::before { background:var(--orange); }
+.inc.s3::before { background:var(--gold); }
+.inc.s4::before { background:var(--text3); }
+
+.inc:hover, .inc.sel { background:var(--bg3); }
+
+.inc-row {
+  display:flex; align-items:flex-start;
+  justify-content:space-between; gap:8px;
+  margin-bottom:5px;
+}
+
+.inc-title {
+  font-size:12px;
+  font-weight:600;
+  color:var(--text);
+  line-height:1.35;
+}
+
+.sev-tag {
+  font-family:var(--f-mono);
+  font-size:8px;
+  font-weight:700;
+  padding:2px 6px;
+  border-radius:3px;
+  white-space:nowrap;
+  flex-shrink:0;
+  letter-spacing:0.04em;
+}
+
+.t1 { background:var(--redbg);    color:var(--red);    border:1px solid rgba(229,56,59,0.25); }
+.t2 { background:var(--orangebg); color:var(--orange); border:1px solid rgba(244,114,43,0.25); }
+.t3 { background:var(--goldbg2);  color:var(--gold);   border:1px solid rgba(212,160,23,0.3); }
+.t4 { background:var(--bg4);      color:var(--text3);  border:1px solid var(--border2); }
+
+.inc-meta {
+  font-family:var(--f-mono);
+  font-size:9px;
+  color:var(--text3);
+  display:flex; gap:10px;
+  margin-bottom:4px;
+}
+
+.inc-desc {
+  font-size:11px;
+  color:var(--text2);
+  line-height:1.5;
+}
+
+/* ─ main col (map + intake) ─ */
+.main-col {
+  display:flex; flex-direction:column;
+  overflow:hidden;
+  background:var(--bg);
+}
+
+.map-intake {
+  flex:1;
+  display:grid;
+  grid-template-columns:1fr 360px;
+  overflow:hidden;
+}
+
+/* ─ map ─ */
+.map-wrap {
+  position:relative;
+  overflow:hidden;
+  border-right:1px solid var(--border);
+}
+
+.map-wrap::before {
+  content:'';
+  position:absolute; inset:0;
+  background-image:
+    linear-gradient(rgba(212,160,23,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212,160,23,0.05) 1px, transparent 1px);
+  background-size:40px 40px;
+}
+
+.map-canvas { position:absolute; inset:0; z-index:2; }
+.blips-layer { position:absolute; inset:0; z-index:5; }
+
+.map-label {
+  position:absolute;
+  top:14px; left:14px;
+  z-index:10;
+}
+
+.map-label-top {
+  font-family:var(--f-mono);
+  font-size:9px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--text3);
+}
+
+.map-label-city {
+  font-family:var(--f-head);
+  font-size:24px;
+  letter-spacing:0.04em;
+  color:var(--text);
+  line-height:1;
+}
+
+.map-legend {
+  position:absolute;
+  bottom:14px; left:14px;
+  z-index:10;
+  display:flex; flex-direction:column; gap:4px;
+}
+
+.leg-row {
+  display:flex; align-items:center; gap:6px;
+  font-family:var(--f-mono);
+  font-size:9px;
+  color:var(--text2);
+}
+
+.leg-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+
+/* blips */
+.blip {
+  position:absolute;
+  transform:translate(-50%,-50%);
+  cursor:pointer;
+}
+
+.blip-ring {
+  position:absolute; inset:-6px;
+  border-radius:50%;
+  border:1.5px solid currentColor;
+  opacity:0;
+  animation:ripple 2.5s ease-out infinite;
+}
+
+.blip-ring2 { animation-delay:0.9s; }
+
+@keyframes ripple {
+  0%   { transform:scale(0.5); opacity:0.7; }
+  100% { transform:scale(2.5); opacity:0; }
+}
+
+.blip-core {
+  width:11px; height:11px;
+  border-radius:50%;
+  border:2px solid var(--bg);
+}
+
+.blip.b1 .blip-core { background:var(--red);    color:var(--red); }
+.blip.b1 .blip-ring { color:var(--red); }
+.blip.b2 .blip-core { background:var(--orange);  color:var(--orange); }
+.blip.b2 .blip-ring { color:var(--orange); }
+.blip.b3 .blip-core { background:var(--gold);    color:var(--gold); }
+.blip.b3 .blip-ring { color:var(--gold); }
+.blip.b4 .blip-core { background:var(--text3);   color:var(--text3); }
+.blip.b4 .blip-ring { color:var(--text3); }
+.blip.acked .blip-core { background:var(--green); border-color:var(--bg); }
+.blip.acked .blip-ring { color:var(--green) !important; }
+
+.blip-tip {
+  position:absolute;
+  left:16px; top:-5px;
+  font-family:var(--f-mono);
+  font-size:9px;
+  color:var(--text);
+  white-space:nowrap;
+  background:var(--bg2);
+  border:1px solid var(--border2);
+  padding:2px 8px;
+  border-radius:3px;
+  opacity:0;
+  transition:opacity 0.15s;
+  pointer-events:none;
+  z-index:20;
+}
+
+.blip:hover .blip-tip { opacity:1; }
+
+/* ─ intake ─ */
+.intake-wrap {
+  display:flex; flex-direction:column;
+  overflow:hidden;
+  background:var(--bg);
+}
+
+.intake-scroll {
+  flex:1;
+  overflow-y:auto;
+  padding:14px;
+}
+
+/* section heading */
+.sh {
+  font-family:var(--f-mono);
+  font-size:9px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--text3);
+  margin-bottom:8px;
+  display:flex; align-items:center; gap:8px;
+}
+
+.sh::after { content:''; flex:1; height:1px; background:var(--border); }
+
+/* preset pills */
+.pills { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:14px; }
+
+.pill {
+  font-family:var(--f-mono);
+  font-size:9px;
+  padding:4px 10px;
+  border-radius:20px;
+  border:1px solid var(--border2);
+  color:var(--text3);
+  cursor:pointer;
+  transition:all 0.12s;
+  background:transparent;
+  letter-spacing:0.02em;
+}
+
+.pill:hover { border-color:var(--gold); color:var(--gold); background:var(--goldbg); }
+
+/* type grid */
+.type-grid {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:5px;
+  margin-bottom:14px;
+}
+
+.type-opt {
+  border:1px solid var(--border);
+  background:transparent;
+  padding:8px 4px;
+  text-align:center;
+  cursor:pointer;
+  font-family:var(--f-mono);
+  font-size:9px;
+  color:var(--text3);
+  letter-spacing:0.04em;
+  text-transform:uppercase;
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+  transition:all 0.12s;
+  border-radius:4px;
+}
+
+.type-ico { font-size:14px; }
+.type-opt:hover { border-color:var(--border2); color:var(--text2); }
+.type-opt.on { border-color:var(--gold); color:var(--gold); background:var(--goldbg); }
+
+/* severity */
+.sev-strip {
+  display:grid; grid-template-columns:repeat(4,1fr);
+  gap:5px; margin-bottom:14px;
+}
+
+.sev-opt {
+  padding:6px 4px;
+  text-align:center;
+  font-family:var(--f-head);
+  font-size:11px;
+  letter-spacing:0.06em;
+  cursor:pointer;
+  border-radius:3px;
+  transition:all 0.12s;
+  border:1px solid transparent;
+}
+
+.sev-opt[data-s="1"] { color:var(--red);    background:var(--redbg);    border-color:rgba(229,56,59,0.2); }
+.sev-opt[data-s="2"] { color:var(--orange); background:var(--orangebg); border-color:rgba(244,114,43,0.2); }
+.sev-opt[data-s="3"] { color:var(--gold);   background:var(--goldbg);   border-color:rgba(212,160,23,0.2); }
+.sev-opt[data-s="4"] { color:var(--text3);  background:var(--bg3);      border-color:var(--border); }
+.sev-opt.on { outline:2px solid currentColor; outline-offset:2px; }
+
+/* form */
+.fg { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-bottom:7px; }
+.fg.full { grid-template-columns:1fr; }
+.fgrp { display:flex; flex-direction:column; gap:4px; }
+
+.flbl {
+  font-family:var(--f-mono);
+  font-size:9px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--text3);
+}
+
+input, select, textarea {
+  background:var(--bg2);
+  border:1px solid var(--border);
+  color:var(--text);
+  font-family:var(--f-mono);
+  font-size:11px;
+  padding:7px 10px;
+  outline:none;
+  transition:border-color 0.12s;
+  width:100%;
+  border-radius:4px;
+  -webkit-appearance:none;
+}
+
+input::placeholder, textarea::placeholder { color:var(--text3); }
+input:focus, select:focus, textarea:focus { border-color:var(--gold); }
+select option { background:var(--bg2); color:var(--text); }
+textarea { resize:vertical; min-height:72px; line-height:1.5; }
+
+.analyse-btn {
+  width:100%;
+  padding:11px;
+  background:var(--gold);
+  color:#000;
+  border:none;
+  font-family:var(--f-head);
+  font-size:17px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:all 0.2s;
+  border-radius:4px;
+  margin-top:4px;
+}
+
+.analyse-btn:hover:not(:disabled) { background:var(--gold2); transform:translateY(-1px); }
+.analyse-btn:disabled { opacity:0.35; cursor:not-allowed; }
+
+/* advisory banner */
+.advisory {
+  background:rgba(212,160,23,0.07);
+  border:1px solid rgba(212,160,23,0.25);
+  border-left:3px solid var(--gold);
+  padding:8px 12px;
+  font-family:var(--f-mono);
+  font-size:9px;
+  letter-spacing:0.04em;
+  color:var(--gold);
+  margin-top:12px;
+  border-radius:0 4px 4px 0;
+}
+
+.advisory strong { color:var(--text); }
+
+/* ai result */
+.ai-result {
+  background:var(--bg2);
+  border:1px solid var(--border2);
+  border-radius:6px;
+  margin-top:10px;
+  overflow:hidden;
+  animation:fadeUp 0.35s ease;
+}
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(8px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+.ai-head {
+  background:var(--bg3);
+  padding:10px 14px;
+  display:flex; align-items:center; justify-content:space-between;
+  border-bottom:1px solid var(--border);
+}
+
+.ai-sig {
+  font-family:var(--f-mono);
+  font-size:9px;
+  color:var(--text3);
+  letter-spacing:0.06em;
+  display:flex; align-items:center; gap:6px;
+}
+
+.ai-dot {
+  width:6px; height:6px;
+  background:var(--blue);
+  border-radius:50%;
+  animation:blink 1.2s ease-in-out infinite;
+}
+
+.urg-tag {
+  font-family:var(--f-head);
+  font-size:15px;
+  letter-spacing:0.08em;
+  padding:3px 14px;
+  border-radius:3px;
+}
+
+.CRITICAL { background:var(--redbg);    color:var(--red);    border:1px solid rgba(229,56,59,0.3); }
+.HIGH     { background:var(--orangebg); color:var(--orange); border:1px solid rgba(244,114,43,0.3); }
+.MEDIUM   { background:var(--goldbg2);  color:var(--gold);   border:1px solid rgba(212,160,23,0.3); }
+.LOW      { background:var(--bg4);      color:var(--text3);  border:1px solid var(--border2); }
+
+.ai-body { padding:12px; display:flex; flex-direction:column; gap:10px; }
+
+.ai-summary {
+  font-size:12px;
+  line-height:1.65;
+  color:var(--text2);
+  padding:10px 12px;
+  background:var(--bg);
+  border-left:2px solid var(--gold);
+  border-radius:0 4px 4px 0;
+}
+
+.info-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+
+.ibox {
+  background:var(--bg3);
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:9px 11px;
+}
+
+.ibox.danger { border-color:rgba(229,56,59,0.25); background:var(--redbg); }
+
+.ibl {
+  font-family:var(--f-mono);
+  font-size:8px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--text3);
+  margin-bottom:4px;
+}
+
+.ibl.red { color:rgba(229,56,59,0.8); }
+
+.ival {
+  font-size:12px;
+  color:var(--text);
+  line-height:1.4;
+}
+
+.steps { display:flex; flex-direction:column; gap:5px; }
+
+.step {
+  display:flex; gap:10px; align-items:flex-start;
+  font-size:11px; line-height:1.5; color:var(--text2);
+}
+
+.step-n {
+  font-family:var(--f-mono);
+  font-size:9px;
+  color:#000;
+  background:var(--gold);
+  width:18px; height:18px;
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+  margin-top:1px;
+  font-weight:700;
+}
+
+.add-btn {
+  width:100%;
+  padding:9px;
+  background:transparent;
+  color:var(--gold);
+  border:1px solid rgba(212,160,23,0.4);
+  font-family:var(--f-head);
+  font-size:14px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:all 0.15s;
+  border-radius:4px;
+}
+
+.add-btn:hover { background:var(--goldbg2); border-color:var(--gold); }
+
+/* loading */
+.ai-loading {
+  padding:28px;
+  display:flex; flex-direction:column;
+  align-items:center; gap:12px;
+  border:1px solid var(--border);
+  border-radius:6px;
+  margin-top:12px;
+  background:var(--bg2);
+}
+
+.spinner {
+  width:24px; height:24px;
+  border:2px solid var(--border2);
+  border-top-color:var(--gold);
+  border-radius:50%;
+  animation:spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform:rotate(360deg); } }
+
+.spin-lbl {
+  font-family:var(--f-mono);
+  font-size:10px;
+  color:var(--text3);
+  letter-spacing:0.1em;
+}
+
+/* ─ queue col ─ */
+.q-scroll {
+  flex:1; overflow-y:auto;
+  padding:8px;
+  display:flex; flex-direction:column; gap:5px;
+}
+
+.q-item {
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:5px;
+  padding:9px 11px;
+  display:flex; align-items:center; gap:8px;
+  animation:slideR 0.25s ease;
+  transition:border-color 0.12s;
+}
+
+.q-item:hover { border-color:var(--border2); }
+
+@keyframes slideR {
+  from { opacity:0; transform:translateX(12px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+
+.q-pip {
+  width:7px; height:7px;
+  border-radius:50%;
+  flex-shrink:0;
+}
+
+.q-pip.s1 { background:var(--red);    box-shadow:0 0 5px var(--red); }
+.q-pip.s2 { background:var(--orange); }
+.q-pip.s3 { background:var(--gold); }
+.q-pip.s4 { background:var(--text3); }
+
+.q-body { flex:1; min-width:0; }
+
+.q-name {
+  font-size:12px;
+  font-weight:600;
+  color:var(--text);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+
+.q-sub {
+  font-family:var(--f-mono);
+  font-size:9px;
+  color:var(--text3);
+  margin-top:2px;
+}
+
+.q-res {
+  font-family:var(--f-mono);
+  font-size:9px;
+  color:var(--text3);
+  border:1px solid var(--border);
+  padding:3px 8px;
+  background:transparent;
+  cursor:pointer;
+  transition:all 0.12s;
+  border-radius:3px;
+  flex-shrink:0;
+}
+
+.q-res:hover { color:var(--green); border-color:var(--green); }
+
+.q-empty {
+  padding:30px 14px;
+  text-align:center;
+  font-family:var(--f-mono);
+  font-size:9px;
+  color:var(--text3);
+  letter-spacing:0.08em;
+  line-height:1.8;
+  border:1px dashed var(--border);
+  border-radius:5px;
+}
+
+/* ════════════════════════════════
+   ANALYTICS VIEW
+════════════════════════════════ */
+.view-inner {
+  flex:1; overflow-y:auto;
+  padding:24px;
+  scrollbar-width:thin;
+  scrollbar-color:var(--border2) transparent;
+}
+
+.pg-head { margin-bottom:20px; }
+
+.pg-title {
+  font-family:var(--f-head);
+  font-size:40px;
+  letter-spacing:0.04em;
+  color:var(--text);
+  line-height:1;
+}
+
+.pg-title span { color:var(--gold); }
+
+.pg-sub {
+  font-family:var(--f-mono);
+  font-size:9px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--text3);
+  margin-top:6px;
+}
+
+.a-cards { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:16px; }
+
+.a-card {
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-top:2px solid var(--gold);
+  border-radius:6px;
+  padding:14px 16px;
+}
+
+.a-card-l {
+  font-family:var(--f-mono);
+  font-size:9px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--text3);
+  margin-bottom:8px;
+}
+
+.a-card-v {
+  font-family:var(--f-head);
+  font-size:40px;
+  line-height:1;
+  color:var(--text);
+}
+
+.a-card-s {
+  font-family:var(--f-mono);
+  font-size:9px;
+  color:var(--text3);
+  margin-top:4px;
+}
+
+.chart-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+
+.chart-box {
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:16px;
+}
+
+.chart-title {
+  font-family:var(--f-head);
+  font-size:14px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--text);
+  margin-bottom:14px;
+  border-bottom:1px solid var(--border);
+  padding-bottom:8px;
+}
+
+.bar-row {
+  display:flex; align-items:center; gap:10px;
+  font-family:var(--f-mono); font-size:9px;
+  margin-bottom:9px;
+}
+
+.bar-lbl { width:80px; color:var(--text2); text-align:right; flex-shrink:0; }
+.bar-track { flex:1; height:8px; background:var(--bg3); border-radius:2px; overflow:hidden; }
+.bar-fill { height:100%; border-radius:2px; transition:width 1s ease; }
+.bar-val { width:24px; color:var(--gold); font-weight:700; text-align:right; }
+
+/* ════════════════════════════════
+   RESPONSIBLE AI
+════════════════════════════════ */
+.resp-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; max-width:1000px; }
+
+.resp-card {
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-top:2px solid var(--orange);
+  border-radius:6px;
+  padding:16px;
+}
+
+.resp-card.high  { border-top-color:var(--red); }
+.resp-card.low   { border-top-color:var(--green); }
+
+.resp-icon { font-size:20px; margin-bottom:8px; }
+
+.resp-title {
+  font-family:var(--f-head);
+  font-size:15px;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:var(--text);
+  margin-bottom:4px;
+}
+
+.resp-risk {
+  font-family:var(--f-mono);
+  font-size:9px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  margin-bottom:8px;
+}
+
+.rl-crit   { color:var(--red); }
+.rl-high   { color:var(--orange); }
+.rl-med    { color:var(--gold); }
+.rl-low    { color:var(--green); }
+
+.resp-body { font-size:11px; line-height:1.65; color:var(--text2); margin-bottom:10px; }
+
+.resp-fix {
+  padding:8px 10px;
+  background:var(--greenbg);
+  border-left:2px solid var(--green);
+  font-size:11px;
+  line-height:1.6;
+  color:var(--text2);
+  border-radius:0 4px 4px 0;
+}
+
+/* ════════════════════════════════
+   SETTINGS
+════════════════════════════════ */
+.settings-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; max-width:780px; }
+
+.setting-card {
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:16px;
+}
+
+.setting-title {
+  font-family:var(--f-head);
+  font-size:15px;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:var(--text);
+  margin-bottom:4px;
+}
+
+.setting-desc { font-size:11px; color:var(--text2); line-height:1.5; margin-bottom:12px; }
+
+.tog-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:7px 0;
+  border-bottom:1px solid var(--border);
+}
+
+.tog-row:last-of-type { border-bottom:none; }
+
+.tog-lbl { font-family:var(--f-mono); font-size:10px; color:var(--text2); letter-spacing:0.02em; }
+
+.tog {
+  width:34px; height:18px;
+  background:var(--bg4);
+  border-radius:9px;
+  position:relative;
+  cursor:pointer;
+  transition:background 0.2s;
+  flex-shrink:0;
+  border:1px solid var(--border2);
+}
+
+.tog.on { background:var(--gold); border-color:var(--gold); }
+
+.tog::after {
+  content:'';
+  position:absolute;
+  top:2px; left:2px;
+  width:12px; height:12px;
+  background:var(--text3);
+  border-radius:50%;
+  transition:all 0.2s;
+}
+
+.tog.on::after { left:18px; background:#000; }
+
+/* ════════════════════════════════
+   FIELD REPORT
+════════════════════════════════ */
+.rpt-form { max-width:660px; display:flex; flex-direction:column; gap:12px; }
+
+.rpt-block {
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:18px;
+}
+
+.rpt-block-title {
+  font-family:var(--f-head);
+  font-size:14px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--text);
+  margin-bottom:14px;
+  display:flex; align-items:center; gap:8px;
+}
+
+.rpt-block-title::after { content:''; flex:1; height:1px; background:var(--border); }
+
+.rpt-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.rpt-grid .full { grid-column:1/-1; }
+
+.rpt-lbl { font-family:var(--f-mono); font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:var(--text3); display:block; margin-bottom:4px; }
+
+.submit-btn {
+  padding:12px 32px;
+  background:var(--gold);
+  color:#000;
+  border:none;
+  font-family:var(--f-head);
+  font-size:17px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:all 0.15s;
+  border-radius:4px;
+  align-self:flex-start;
+}
+
+.submit-btn:hover { background:var(--gold2); }
+
+/* ════════════════════════════════
+   SESSION LOG
+════════════════════════════════ */
+.log-actions { display:flex; gap:8px; margin-bottom:14px; }
+
+.log-btn {
+  padding:7px 14px;
+  background:transparent;
+  border:1px solid var(--border2);
+  color:var(--text3);
+  font-family:var(--f-mono);
+  font-size:9px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  cursor:pointer;
+  border-radius:4px;
+  transition:all 0.12s;
+}
+
+.log-btn:hover { border-color:var(--gold); color:var(--gold); }
+
+.log-list { display:flex; flex-direction:column; gap:5px; }
+
+.log-entry {
+  display:flex; gap:12px; align-items:flex-start;
+  padding:9px 12px;
+  border-left:2px solid var(--border2);
+  background:var(--bg2);
+  border-radius:0 5px 5px 0;
+  font-family:var(--f-mono);
+  font-size:10px;
+  line-height:1.5;
+  color:var(--text2);
+}
+
+.log-entry.lc { border-left-color:var(--red); }
+.log-entry.lh { border-left-color:var(--orange); }
+.log-entry.lm { border-left-color:var(--gold); }
+.log-entry.lr { border-left-color:var(--green); color:var(--text3); }
+
+.log-time { color:var(--text3); flex-shrink:0; }
+
+.log-empty {
+  padding:24px;
+  text-align:center;
+  font-family:var(--f-mono);
+  font-size:10px;
+  color:var(--text3);
+  border:1px dashed var(--border);
+  border-radius:5px;
+}
+
+/* ════════════════════════════════
+   SIM OVERLAY
+════════════════════════════════ */
+.sim-overlay {
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.85);
+  z-index:8000;
+  display:none;
+  align-items:center; justify-content:center;
+  backdrop-filter:blur(4px);
+}
+
+.sim-overlay.show { display:flex; }
+
+.sim-box {
+  background:var(--bg2);
+  border:1px solid var(--border2);
+  border-top:3px solid var(--gold);
+  border-radius:8px;
+  padding:36px 44px;
+  text-align:center;
+  max-width:440px;
+  width:90%;
+}
+
+.sim-title {
+  font-family:var(--f-head);
+  font-size:30px;
+  letter-spacing:0.06em;
+  color:var(--text);
+  margin-bottom:6px;
+}
+
+.sim-sub {
+  font-family:var(--f-mono);
+  font-size:10px;
+  color:var(--text3);
+  line-height:1.7;
+  margin-bottom:24px;
+  letter-spacing:0.04em;
+}
+
+.sim-inc-name {
+  font-family:var(--f-head);
+  font-size:20px;
+  color:var(--gold);
+  margin-bottom:10px;
+  min-height:28px;
+}
+
+.sim-pips { display:flex; gap:8px; justify-content:center; margin-bottom:16px; }
+
+.sim-pip {
+  width:36px; height:3px;
+  background:var(--border2);
+  border-radius:2px;
+  transition:background 0.3s;
+}
+
+.sim-pip.done   { background:var(--green); }
+.sim-pip.active { background:var(--gold); }
+
+.sim-status {
+  font-family:var(--f-mono);
+  font-size:10px;
+  color:var(--text3);
+  letter-spacing:0.06em;
+  min-height:18px;
+}
+
+.sim-close {
+  display:none;
+  margin-top:20px;
+  padding:9px 24px;
+  background:var(--gold);
+  color:#000;
+  border:none;
+  font-family:var(--f-head);
+  font-size:14px;
+  letter-spacing:0.08em;
+  cursor:pointer;
+  border-radius:4px;
+  transition:all 0.15s;
+}
+
+.sim-close:hover { background:var(--gold2); }
+
+/* ════════════════════════════════
+   HANDOVER MODAL
+════════════════════════════════ */
+.modal-bg {
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.8);
+  z-index:8500;
+  display:none;
+  align-items:center; justify-content:center;
+  backdrop-filter:blur(3px);
+}
+
+.modal-bg.show { display:flex; }
+
+.modal-box {
+  background:var(--bg2);
+  border:1px solid var(--border2);
+  border-top:3px solid var(--gold);
+  border-radius:8px;
+  width:660px;
+  max-width:95vw;
+  max-height:85vh;
+  display:flex; flex-direction:column;
+  overflow:hidden;
+}
+
+.modal-head {
+  padding:14px 20px;
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+  flex-shrink:0;
+}
+
+.modal-title {
+  font-family:var(--f-head);
+  font-size:20px;
+  letter-spacing:0.08em;
+  color:var(--text);
+}
+
+.modal-x {
+  background:transparent;
+  border:1px solid var(--border2);
+  color:var(--text3);
+  font-family:var(--f-mono);
+  font-size:10px;
+  padding:4px 10px;
+  border-radius:3px;
+  cursor:pointer;
+  transition:all 0.12s;
+}
+
+.modal-x:hover { border-color:var(--red); color:var(--red); }
+
+.modal-body {
+  flex:1; overflow-y:auto;
+  padding:20px;
+  scrollbar-width:thin;
+  scrollbar-color:var(--border2) transparent;
+}
+
+.handover-out {
+  font-family:var(--f-mono);
+  font-size:12px;
+  line-height:1.85;
+  color:var(--text2);
+  white-space:pre-wrap;
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:16px;
+  min-height:200px;
+}
+
+.handover-out.gen { color:var(--text3); font-style:italic; }
+
+.modal-foot {
+  padding:14px 20px;
+  border-top:1px solid var(--border);
+  display:flex; gap:8px;
+  flex-shrink:0;
+}
+
+.m-btn {
+  padding:9px 18px;
+  font-family:var(--f-mono);
+  font-size:10px;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  cursor:pointer;
+  border-radius:4px;
+  transition:all 0.12s;
+  border:1px solid var(--border2);
+  background:transparent;
+  color:var(--text2);
+}
+
+.m-btn:hover { border-color:var(--gold); color:var(--gold); }
+.m-btn.primary { background:var(--gold); color:#000; border-color:var(--gold); }
+.m-btn.primary:hover { background:var(--gold2); }
+
+/* ════════════════════════════════
+   TOAST
+════════════════════════════════ */
+.toast {
+  position:fixed;
+  bottom:20px; right:20px;
+  background:var(--bg2);
+  border:1px solid var(--gold);
+  border-radius:5px;
+  padding:10px 16px;
+  font-family:var(--f-mono);
+  font-size:10px;
+  letter-spacing:0.06em;
+  color:var(--gold);
+  z-index:9999;
+  animation:tIn 0.2s ease, tOut 0.2s ease 2.6s forwards;
+  text-transform:uppercase;
+}
+
+@keyframes tIn  { from { opacity:0; transform:translateY(6px); } }
+@keyframes tOut { to   { opacity:0; } }
+
+@keyframes tickerScroll {
+  from { transform: translateX(100vw); }
+  to   { transform: translateX(-100%); }
+}
+
+#ticker { animation-duration: 70s !important; }
+
+/* ════════════════════════════════
+   GOLD GLOWS on key elements
+════════════════════════════════ */
+.stat:hover .stat-n { text-shadow: 0 0 20px currentColor; }
+
+.urg-tag.CRITICAL { box-shadow: 0 0 12px rgba(229,56,59,0.4); }
+.urg-tag.HIGH     { box-shadow: 0 0 12px rgba(244,114,43,0.3); }
+.urg-tag.MEDIUM   { box-shadow: 0 0 12px rgba(212,160,23,0.3); }
+
+.q-pip.s1 { box-shadow: 0 0 7px var(--red); }
+
+.col-badge { box-shadow: 0 0 10px rgba(212,160,23,0.15); }
+
+.analyse-btn { box-shadow: 0 4px 20px rgba(212,160,23,0.2); }
+.analyse-btn:hover:not(:disabled) { box-shadow: 0 4px 28px rgba(212,160,23,0.4); }
+
+.w-cta { box-shadow: 0 4px 30px rgba(212,160,23,0.3); }
+.w-cta:hover { box-shadow: 0 6px 40px rgba(212,160,23,0.5); }
+
+/* ════════════════════════════════
+   SMOOTH VIEW TRANSITIONS
+════════════════════════════════ */
+.view {
+  position:absolute; inset:0;
+  display:none;
+  overflow:hidden;
+  opacity:0;
+  transform:translateY(6px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.view.on {
+  display:flex;
+  flex-direction:column;
+  opacity:1;
+  transform:translateY(0);
+  animation: viewIn 0.25s ease forwards;
+}
+
+@keyframes viewIn {
+  from { opacity:0; transform:translateY(8px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ════════════════════════════════
+   MAP POPUP
+════════════════════════════════ */
+.map-popup {
+  position:absolute;
+  z-index:20;
+  background:var(--bg2);
+  border:1px solid var(--border2);
+  border-top:2px solid var(--gold);
+  border-radius:6px;
+  padding:12px 14px;
+  width:220px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.6);
+  animation:fadeUp 0.2s ease;
+  pointer-events:all;
+}
+
+.map-popup::before {
+  content:'';
+  position:absolute;
+  bottom:-6px; left:16px;
+  width:10px; height:10px;
+  background:var(--bg2);
+  border-right:1px solid var(--border2);
+  border-bottom:1px solid var(--border2);
+  transform:rotate(45deg);
+}
+
+.mp-sev {
+  font-family:var(--f-mono);
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:0.1em;
+  margin-bottom:6px;
+}
+
+.mp-title {
+  font-size:12px;
+  font-weight:600;
+  color:var(--text);
+  line-height:1.4;
+  margin-bottom:6px;
+}
+
+.mp-meta {
+  font-family:var(--f-mono);
+  font-size:9px;
+  color:var(--text3);
+  margin-bottom:10px;
+  line-height:1.6;
+}
+
+.mp-btn {
+  width:100%;
+  padding:7px;
+  background:var(--gold);
+  color:#000;
+  border:none;
+  font-family:var(--f-head);
+  font-size:13px;
+  letter-spacing:0.08em;
+  cursor:pointer;
+  border-radius:3px;
+  transition:all 0.15s;
+}
+
+.mp-btn:hover { background:var(--gold2); }
+
+.mp-close {
+  position:absolute;
+  top:8px; right:8px;
+  background:transparent;
+  border:none;
+  color:var(--text3);
+  font-size:12px;
+  cursor:pointer;
+  line-height:1;
+  padding:2px 5px;
+}
+
+.mp-close:hover { color:var(--text); }
+
+/* ════════════════════════════════
+   PRIORITY TIMERS on incident cards
+════════════════════════════════ */
+.inc-timer {
+  font-family:var(--f-mono);
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:0.04em;
+  margin-left:auto;
+  flex-shrink:0;
+}
+
+.timer-crit  { color:var(--red);    animation:timerPulse 1s ease-in-out infinite; }
+.timer-high  { color:var(--orange); }
+.timer-med   { color:var(--gold); }
+.timer-low   { color:var(--text3); }
+
+@keyframes timerPulse { 50% { opacity:0.4; } }
+
+/* ════════════════════════════════
+   BOTTOM STATUS BAR
+════════════════════════════════ */
+.status-bar {
+  position:absolute;
+  bottom:0; left:0; right:0;
+  height:26px;
+  background:var(--bg2);
+  border-top:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  padding:0 12px;
+  gap:20px;
+  z-index:10;
+  flex-shrink:0;
+}
+
+.sb-stat {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-family:var(--f-mono);
+  font-size:9px;
+  color:var(--text3);
+  letter-spacing:0.06em;
+}
+
+.sb-stat strong { color:var(--text2); }
+.sb-stat.live strong { color:var(--green); }
+
+.sb-divider { width:1px; height:12px; background:var(--border); }
+
+.sb-kbd {
+  margin-left:auto;
+  font-family:var(--f-mono);
+  font-size:8px;
+  color:var(--text3);
+  letter-spacing:0.06em;
+}
+
+.kbd {
+  display:inline-block;
+  background:var(--bg3);
+  border:1px solid var(--border2);
+  border-radius:3px;
+  padding:1px 5px;
+  font-size:8px;
+  color:var(--text3);
+  margin:0 2px;
+}
+
+/* adjust cmd-body to leave room for status bar */
+.cmd-body { bottom:26px !important; }
+
+/* ════════════════════════════════
+   ESCALATION STATE
+════════════════════════════════ */
+.q-item.escalated {
+  border-color:rgba(244,114,43,0.4);
+  background:rgba(244,114,43,0.04);
+}
+
+.q-esc-badge {
+  font-family:var(--f-mono);
+  font-size:8px;
+  color:var(--orange);
+  background:var(--orangebg);
+  border:1px solid rgba(244,114,43,0.3);
+  padding:1px 6px;
+  border-radius:3px;
+  flex-shrink:0;
+}
+
+.q-esc-btn {
+  font-family:var(--f-mono);
+  font-size:8px;
+  color:var(--text3);
+  border:1px solid var(--border);
+  padding:2px 6px;
+  background:transparent;
+  cursor:pointer;
+  border-radius:3px;
+  transition:all 0.12s;
+  flex-shrink:0;
+}
+
+.q-esc-btn:hover { color:var(--orange); border-color:var(--orange); }
+
+/* ════════════════════════════════
+   SOUND TOGGLE BUTTON
+════════════════════════════════ */
+.sound-btn {
+  position:fixed;
+  bottom:34px; left:60px;
+  z-index:100;
+  background:var(--bg2);
+  border:1px solid var(--border2);
+  border-radius:50%;
+  width:28px; height:28px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer;
+  font-size:13px;
+  transition:all 0.15s;
+  opacity:0.5;
+}
+
+.sound-btn:hover { opacity:1; border-color:var(--gold); }
+.sound-btn.muted { opacity:0.3; }
+
+/* ════════════════════════════════
+   PRINT / EXPORT REPORT
+════════════════════════════════ */
+.export-modal-bg {
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.85);
+  z-index:8600;
+  display:none;
+  align-items:center; justify-content:center;
+  backdrop-filter:blur(3px);
+}
+
+.export-modal-bg.show { display:flex; }
+
+.export-box {
+  background:var(--bg2);
+  border:1px solid var(--border2);
+  border-top:3px solid var(--gold);
+  border-radius:8px;
+  width:720px;
+  max-width:95vw;
+  max-height:88vh;
+  display:flex; flex-direction:column;
+  overflow:hidden;
+}
+
+.export-preview {
+  flex:1;
+  overflow-y:auto;
+  padding:24px;
+  background:#fff;
+  color:#111;
+  font-family:Georgia, serif;
+  font-size:13px;
+  line-height:1.7;
+  scrollbar-width:thin;
+}
+
+.export-preview h1 { font-size:22px; margin-bottom:4px; }
+.export-preview h2 { font-size:15px; margin:16px 0 8px; border-bottom:1px solid #ddd; padding-bottom:4px; }
+.export-preview .ep-meta { font-size:11px; color:#666; margin-bottom:20px; font-family:monospace; }
+.export-preview .ep-row { display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #f0f0f0; font-size:12px; }
+.export-preview .ep-sev { font-weight:700; }
+.ep-crit { color:#C0121A; } .ep-high { color:#B84A10; } .ep-med { color:#8B5E0A; } .ep-low { color:#666; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════
+     WELCOME SCREEN
+══════════════════════════════════ -->
+<div id="welcome">
+  <div class="w-inner">
+    <div class="w-emblem">
+      <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:80px;height:80px">
+        <circle cx="40" cy="40" r="36" stroke="#D4A017" stroke-width="1" opacity="0.2"/>
+        <circle cx="40" cy="40" r="26" stroke="#D4A017" stroke-width="1" opacity="0.35"/>
+        <circle cx="40" cy="40" r="16" stroke="#D4A017" stroke-width="1" opacity="0.55"/>
+        <circle cx="40" cy="40" r="4"  fill="#D4A017"/>
+        <line x1="40" y1="4"  x2="40" y2="76" stroke="#D4A017" stroke-width="0.5" opacity="0.25"/>
+        <line x1="4"  y1="40" x2="76" y2="40" stroke="#D4A017" stroke-width="0.5" opacity="0.25"/>
+        <!-- Radar sweep -->
+        <g style="transform-origin:40px 40px;animation:radarSweep 3s linear infinite">
+          <defs>
+            <radialGradient id="sweepGrad" cx="0" cy="0" r="1" gradientTransform="translate(40,40) scale(36)">
+              <stop offset="0%" stop-color="#D4A017" stop-opacity="0.6"/>
+              <stop offset="100%" stop-color="#D4A017" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <path d="M40 40 L40 4 A36 36 0 0 1 76 40 Z" fill="url(#sweepGrad)" opacity="0.5"/>
+          <line x1="40" y1="40" x2="40" y2="4" stroke="#D4A017" stroke-width="1.5" opacity="0.9"/>
+        </g>
+      </svg>
+      <style>@keyframes radarSweep { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }</style>
+    </div>
+    <div class="w-eyebrow">AI-Powered Public Services Intelligence</div>
+    <div class="w-title">CIVIC<em>PULSE</em></div>
+    <div class="w-sub">Real-time incident command &amp; AI triage</div>
+    <div class="w-line"></div>
+    <div class="w-desc">
+      Mass events and emergency services generate hundreds of incidents that coordinators must triage <strong>instantly</strong>.<br>
+      CivicPulse gives them <strong>AI-powered decision support in under 10 seconds</strong> — so the right action reaches the right place, every time.
+    </div>
+    <div class="w-stats">
+      <div>
+        <div class="w-stat-n">200+</div>
+        <div class="w-stat-l">incident types</div>
+      </div>
+      <div>
+        <div class="w-stat-n">6</div>
+        <div class="w-stat-l">command modules</div>
+      </div>
+      <div>
+        <div class="w-stat-n">100%</div>
+        <div class="w-stat-l">human-in-loop</div>
+      </div>
+    </div>
+    <button class="w-cta" onclick="enter(false)">Enter Command Centre</button>
+    <div class="w-sim-link" onclick="enter(true)">▶ Watch live simulation instead</div>
+  </div>
+  <div class="w-credit">Built by a first-year Engineering student · University of Doha for Science &amp; Technology</div>
+</div>
+
+<!-- ══════════════════════════════════
+     APP
+══════════════════════════════════ -->
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sb-logo">
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;overflow:visible">
+        <circle cx="16" cy="16" r="13" stroke="#000" stroke-width="1" opacity="0.4"/>
+        <circle cx="16" cy="16" r="8"  stroke="#000" stroke-width="1" opacity="0.6"/>
+        <circle cx="16" cy="16" r="3"  fill="#000" opacity="0.9"/>
+        <g style="transform-origin:16px 16px;animation:radarSweep 3s linear infinite">
+          <path d="M16 16 L16 3 A13 13 0 0 1 29 16 Z" fill="#000" opacity="0.25"/>
+          <line x1="16" y1="16" x2="16" y2="3" stroke="#000" stroke-width="1.5" opacity="0.7"/>
+        </g>
+      </svg>
+    </div>
+
+    <button class="sb-btn on" onclick="showV('command',this)" title="Command">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round">
+        <rect x="2" y="3" width="7" height="9" rx="1"/><rect x="13" y="3" width="9" height="5" rx="1"/>
+        <rect x="13" y="12" width="9" height="9" rx="1"/><rect x="2" y="16" width="7" height="5" rx="1"/>
+      </svg>
+    </button>
+
+    <button class="sb-btn" onclick="showV('analytics',this)" title="Analytics">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+    </button>
+
+    <button class="sb-btn" onclick="showV('report',this)" title="Field Report">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="12" y1="18" x2="12" y2="12"/>
+        <line x1="9" y1="15" x2="15" y2="15"/>
+      </svg>
+    </button>
+
+    <button class="sb-btn" onclick="showV('responsible',this)" title="Responsible AI">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+    </button>
+
+    <button class="sb-btn" onclick="showV('log',this)" title="Session Log">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="8" y1="13" x2="16" y2="13"/>
+        <line x1="8" y1="17" x2="16" y2="17"/>
+      </svg>
+    </button>
+
+    <div class="sb-sep"></div>
+    <div class="sb-space"></div>
+    <div class="sb-live"></div>
+
+    <button class="sb-btn" onclick="showV('settings',this)" title="Settings">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+      </svg>
+    </button>
+  </nav>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="tb-brand">
+      <div>
+        <div class="tb-brand-name">CivicPulse</div>
+        <div class="tb-brand-ver">v2.5.0</div>
+      </div>
+    </div>
+    <div class="tb-pill ok"><div class="tb-dot green"></div>Systems Nominal</div>
+    <div class="tb-pill warn"><div class="tb-dot gold"></div>3 Critical Open</div>
+    <div class="tb-pill crit"><div class="tb-dot red"></div>Heat Advisory Active</div>
+    <div id="profile-display" onclick="openProfile()" style="margin-left:8px;padding:0 12px;height:100%;display:flex;align-items:center;gap:6px;border-right:1px solid var(--border);cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">
+      <div style="width:22px;height:22px;border-radius:50%;background:var(--goldbg2);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--gold);font-family:var(--f-mono);flex-shrink:0;">C</div>
+      <span style="font-family:var(--f-mono);font-size:10px;color:var(--text2);">Coordinator</span>
+    </div>
+    <div class="tb-right">
+      <button class="tb-btn" id="sim-btn" onclick="startSim()">▶ Simulation</button>
+      <button class="tb-btn gold" onclick="openHandover()">⇄ Handover</button>
+      <button class="tb-btn" id="theme-btn" onclick="toggleTheme()" title="Switch theme" style="font-size:14px;padding:0 10px;">◑</button>
+      <div class="tb-clock">
+        <div class="tb-time" id="tb-time">--:--:--</div>
+        <div class="tb-date" id="tb-date">——</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- LIVE TICKER -->
+  <div style="grid-column:2;height:28px;background:var(--bg2);border-bottom:1px solid var(--border);overflow:hidden;position:relative;flex-shrink:0;">
+    <div id="ticker" style="display:flex;align-items:center;height:100%;white-space:nowrap;position:absolute;animation:tickerScroll 40s linear infinite;"></div>
+  </div>
+
+  <!-- VIEWS -->
+  <div class="views">
+
+    <!-- ══ COMMAND ══ -->
+    <div id="v-command" class="view on">
+
+      <!-- stat strip -->
+      <div class="stat-strip">
+        <div class="stat">
+          <div class="stat-l">Critical</div>
+          <div class="stat-n n-red" id="sc">03</div>
+          <div class="stat-d">↑ +1 this hour</div>
+        </div>
+        <div class="stat">
+          <div class="stat-l">High priority</div>
+          <div class="stat-n n-orange" id="sh">07</div>
+          <div class="stat-d">→ stable</div>
+        </div>
+        <div class="stat">
+          <div class="stat-l">Units deployed</div>
+          <div class="stat-n n-gold" id="su">12</div>
+          <div class="stat-d">of 18 available</div>
+        </div>
+        <div class="stat">
+          <div class="stat-l">Resolved today</div>
+          <div class="stat-n n-green" id="sr">24</div>
+          <div class="stat-d">↑ +6 vs yesterday</div>
+        </div>
+        <div class="stat">
+          <div class="stat-l">Avg response</div>
+          <div class="stat-n n-text" id="srt">4.2<span style="font-size:14px;font-family:var(--f-mono);font-weight:400">m</span></div>
+          <div class="stat-d">↓ 0.8m under target</div>
+        </div>
+      </div>
+
+      <!-- body -->
+      <div class="cmd-body">
+
+        <!-- LEFT: feed -->
+        <div class="col">
+          <div class="col-head">
+            <div class="col-title">Live Incidents</div>
+            <div class="col-badge" id="feed-badge">8 active</div>
+          </div>
+          <div class="col-scroll" id="feed-list"></div>
+        </div>
+
+        <!-- CENTRE -->
+        <div class="col" style="border-right:none;">
+          <div class="map-intake" style="flex:1;overflow:hidden;">
+
+            <!-- map -->
+            <div class="map-wrap">
+              <div class="map-label">
+                <div class="map-label-top">Zone Overview</div>
+                <div class="map-label-city">Doha Metro</div>
+              </div>
+              <canvas class="map-canvas" id="mapCanvas"></canvas>
+              <div class="blips-layer" id="blips"></div>
+              <div class="map-legend">
+                <div class="leg-row"><div class="leg-dot" style="background:var(--red)"></div>Critical</div>
+                <div class="leg-row"><div class="leg-dot" style="background:var(--orange)"></div>High</div>
+                <div class="leg-row"><div class="leg-dot" style="background:var(--gold)"></div>Medium</div>
+                <div class="leg-row"><div class="leg-dot" style="background:var(--text3)"></div>Low</div>
+              </div>
+            </div>
+
+            <!-- intake -->
+            <div class="intake-wrap">
+              <div class="col-head">
+                <div class="col-title">AI Analysis</div>
+              </div>
+              <div class="intake-scroll">
+                <div class="sh">Quick scenarios</div>
+                <div class="pills">
+                  <div class="pill" onclick="loadP('crowd')">Crowd crush</div>
+                  <div class="pill" onclick="loadP('medical')">Mass casualty</div>
+                  <div class="pill" onclick="loadP('infra')">Power failure</div>
+                  <div class="pill" onclick="loadP('heat')">Heat emergency</div>
+                  <div class="pill" onclick="loadP('lost')">Missing person</div>
+                </div>
+
+                <div class="sh">Incident type</div>
+                <div class="type-grid">
+                  <div class="type-opt on" onclick="pickT(this,'medical')" data-t="medical"><span class="type-ico">🏥</span>Medical</div>
+                  <div class="type-opt" onclick="pickT(this,'crowd')"    data-t="crowd"><span class="type-ico">👥</span>Crowd</div>
+                  <div class="type-opt" onclick="pickT(this,'fire')"     data-t="fire"><span class="type-ico">🔥</span>Fire</div>
+                  <div class="type-opt" onclick="pickT(this,'infra')"    data-t="infra"><span class="type-ico">⚙️</span>Infra</div>
+                  <div class="type-opt" onclick="pickT(this,'security')" data-t="security"><span class="type-ico">🛡️</span>Security</div>
+                  <div class="type-opt" onclick="pickT(this,'other')"    data-t="other"><span class="type-ico">📋</span>Other</div>
+                </div>
+
+                <div class="sh">Severity estimate</div>
+                <div class="sev-strip">
+                  <div class="sev-opt on" data-s="1" onclick="pickS(this)">Critical</div>
+                  <div class="sev-opt"    data-s="2" onclick="pickS(this)">High</div>
+                  <div class="sev-opt"    data-s="3" onclick="pickS(this)">Medium</div>
+                  <div class="sev-opt"    data-s="4" onclick="pickS(this)">Low</div>
+                </div>
+
+                <div class="sh">Details</div>
+                <div class="fg">
+                  <div class="fgrp"><div class="flbl">Location</div><input id="fl" type="text" placeholder="Gate / Station / Zone"/></div>
+                  <div class="fgrp"><div class="flbl">People affected</div><input id="fp" type="number" min="0" placeholder="0"/></div>
+                </div>
+                <div class="fg">
+                  <div class="fgrp"><div class="flbl">Reported by</div><input id="fr" type="text" placeholder="Unit / Volunteer ID"/></div>
+                  <div class="fgrp"><div class="flbl">Resources on scene</div>
+                    <select id="fres">
+                      <option value="none">None yet</option>
+                      <option value="1-volunteer">1 volunteer</option>
+                      <option value="2-3">2–3 volunteers</option>
+                      <option value="medical-unit">Medical unit</option>
+                      <option value="security">Security team</option>
+                      <option value="multi">Multiple units</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="fg full">
+                  <div class="fgrp"><div class="flbl">Situation description</div>
+                    <textarea id="fd" placeholder="Describe the situation in detail…"></textarea>
+                  </div>
+                </div>
+
+                <button class="analyse-btn" id="abtn" onclick="runAI()">Analyse Incident</button>
+                <div id="ai-out"></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- RIGHT: queue -->
+        <div class="col">
+          <div class="col-head">
+            <div class="col-title">Action Queue</div>
+            <div class="col-badge" id="qbadge">0</div>
+          </div>
+          <div class="q-scroll" id="qlist">
+            <div class="q-empty">No items queued.<br>Analyse an incident to add it here.</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- STATUS BAR -->
+      <div class="status-bar">
+        <div class="sb-stat live"><span>●</span>&nbsp;<strong id="sb-active">8</strong> active</div>
+        <div class="sb-divider"></div>
+        <div class="sb-stat"><strong id="sb-resolved">24</strong> resolved today</div>
+        <div class="sb-divider"></div>
+        <div class="sb-stat"><strong id="sb-queued">0</strong> in queue</div>
+        <div class="sb-divider"></div>
+        <div class="sb-stat">avg response <strong id="sb-resp">4.2m</strong></div>
+        <div class="sb-kbd">
+          <span class="kbd">1-6</span> switch tabs &nbsp;
+          <span class="kbd">S</span> simulation &nbsp;
+          <span class="kbd">Esc</span> close
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ══ ANALYTICS ══ -->
+    <div id="v-analytics" class="view">
+      <div class="view-inner">
+        <div class="pg-head">
+          <div class="pg-title">Operations <span>Analytics</span></div>
+          <div class="pg-sub">30-day rolling · Doha Metro Command · Auto-refreshes every 60s</div>
+        </div>
+        <div class="a-cards">
+          <div class="a-card"><div class="a-card-l">Total incidents</div><div class="a-card-v">247</div><div class="a-card-s">↑ 12% vs prior month</div></div>
+          <div class="a-card"><div class="a-card-l">Avg response time</div><div class="a-card-v" style="color:var(--green)">4.2m</div><div class="a-card-s">↓ 18% improvement</div></div>
+          <div class="a-card"><div class="a-card-l">Resolution rate</div><div class="a-card-v">96.3%</div><div class="a-card-s">Target: 95.0%</div></div>
+          <div class="a-card"><div class="a-card-l">AI analyses run</div><div class="a-card-v" style="color:var(--gold)">189</div><div class="a-card-s">since deployment</div></div>
+        </div>
+        <div class="chart-row">
+          <div class="chart-box">
+            <div class="chart-title">Incidents by type</div>
+            <div class="bar-row"><div class="bar-lbl">Medical</div><div class="bar-track"><div class="bar-fill" style="width:72%;background:var(--red)"></div></div><div class="bar-val">72</div></div>
+            <div class="bar-row"><div class="bar-lbl">Crowd</div><div class="bar-track"><div class="bar-fill" style="width:55%;background:var(--orange)"></div></div><div class="bar-val">55</div></div>
+            <div class="bar-row"><div class="bar-lbl">Infrastructure</div><div class="bar-track"><div class="bar-fill" style="width:43%;background:var(--gold)"></div></div><div class="bar-val">43</div></div>
+            <div class="bar-row"><div class="bar-lbl">Security</div><div class="bar-track"><div class="bar-fill" style="width:38%;background:var(--blue)"></div></div><div class="bar-val">38</div></div>
+            <div class="bar-row"><div class="bar-lbl">Other</div><div class="bar-track"><div class="bar-fill" style="width:39%;background:var(--text3)"></div></div><div class="bar-val">39</div></div>
+          </div>
+          <div class="chart-box">
+            <div class="chart-title">Incidents by severity</div>
+            <div class="bar-row"><div class="bar-lbl">Critical</div><div class="bar-track"><div class="bar-fill" style="width:28%;background:var(--red)"></div></div><div class="bar-val">28</div></div>
+            <div class="bar-row"><div class="bar-lbl">High</div><div class="bar-track"><div class="bar-fill" style="width:62%;background:var(--orange)"></div></div><div class="bar-val">62</div></div>
+            <div class="bar-row"><div class="bar-lbl">Medium</div><div class="bar-track"><div class="bar-fill" style="width:89%;background:var(--gold)"></div></div><div class="bar-val">89</div></div>
+            <div class="bar-row"><div class="bar-lbl">Low</div><div class="bar-track"><div class="bar-fill" style="width:68%;background:var(--text3)"></div></div><div class="bar-val">68</div></div>
+          </div>
+        </div>
+        <div class="chart-row">
+          <div class="chart-box">
+            <div class="chart-title">Hourly volume — today</div>
+            <canvas id="trendC" style="width:100%;height:90px;display:block"></canvas>
+          </div>
+          <div class="chart-box">
+            <div class="chart-title">Top locations</div>
+            <div class="bar-row"><div class="bar-lbl" style="width:110px">Lusail Gate 12</div><div class="bar-track"><div class="bar-fill" style="width:80%;background:var(--gold)"></div></div><div class="bar-val">40</div></div>
+            <div class="bar-row"><div class="bar-lbl" style="width:110px">Al Sadd Metro</div><div class="bar-track"><div class="bar-fill" style="width:60%;background:var(--gold)"></div></div><div class="bar-val">30</div></div>
+            <div class="bar-row"><div class="bar-lbl" style="width:110px">Medical Camp B</div><div class="bar-track"><div class="bar-fill" style="width:46%;background:var(--gold)"></div></div><div class="bar-val">23</div></div>
+            <div class="bar-row"><div class="bar-lbl" style="width:110px">Fan Village</div><div class="bar-track"><div class="bar-fill" style="width:38%;background:var(--gold)"></div></div><div class="bar-val">19</div></div>
+            <div class="bar-row"><div class="bar-lbl" style="width:110px">Corniche</div><div class="bar-track"><div class="bar-fill" style="width:30%;background:var(--gold)"></div></div><div class="bar-val">15</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ FIELD REPORT ══ -->
+    <div id="v-report" class="view">
+      <div class="view-inner">
+        <div class="pg-head">
+          <div class="pg-title">Field <span>Report</span></div>
+          <div class="pg-sub">Formal incident documentation for audit and post-event analysis</div>
+        </div>
+        <div class="rpt-form">
+          <div class="rpt-block">
+            <div class="rpt-block-title">Incident Identification</div>
+            <div class="rpt-grid">
+              <div><label class="rpt-lbl">Date</label><input type="date" style="width:100%"/></div>
+              <div><label class="rpt-lbl">Time</label><input type="time" style="width:100%"/></div>
+              <div><label class="rpt-lbl">Location / Zone</label><input type="text" placeholder="Zone / Building / GPS ref"/></div>
+              <div><label class="rpt-lbl">Reporting officer / ID</label><input type="text" placeholder="Name or volunteer ID"/></div>
+              <div class="full"><label class="rpt-lbl">Incident summary</label><textarea style="min-height:80px" placeholder="Concise summary of what occurred…"></textarea></div>
+            </div>
+          </div>
+          <div class="rpt-block">
+            <div class="rpt-block-title">Response Details</div>
+            <div class="rpt-grid">
+              <div><label class="rpt-lbl">Response time (min)</label><input type="number" min="0" placeholder="0"/></div>
+              <div><label class="rpt-lbl">Units dispatched</label><input type="number" min="0" placeholder="0"/></div>
+              <div><label class="rpt-lbl">Injuries / casualties</label><input type="number" min="0" placeholder="0"/></div>
+              <div><label class="rpt-lbl">Outcome</label>
+                <select><option>Fully resolved</option><option>Partially resolved</option><option>Ongoing</option><option>Escalated</option></select>
+              </div>
+              <div class="full"><label class="rpt-lbl">Lessons learned</label><textarea style="min-height:70px" placeholder="Protocol improvements, resource gaps…"></textarea></div>
+            </div>
+          </div>
+          <button class="submit-btn" onclick="toast('Report submitted — ID #'+Math.floor(Math.random()*9000+1000))">Submit Report</button>
+          <button class="submit-btn" style="background:transparent;border:1px solid var(--border2);color:var(--text2);margin-left:10px;" onclick="openExport()">⬇ Export as PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ RESPONSIBLE AI ══ -->
+    <div id="v-responsible" class="view">
+      <div class="view-inner">
+        <div class="pg-head">
+          <div class="pg-title">Responsible <span>AI</span></div>
+          <div class="pg-sub">Risk identification and mitigation — embedded in every AI output</div>
+        </div>
+        <div class="resp-grid">
+          <div class="resp-card high">
+            <div class="resp-icon">⚖️</div>
+            <div class="resp-title">Algorithmic Bias</div>
+            <div class="resp-risk rl-crit">Risk: CRITICAL</div>
+            <div class="resp-body">AI triage may over- or under-prioritise incidents based on how they're described. Language quality and cultural phrasing can skew urgency scores unpredictably.</div>
+            <div class="resp-fix">All AI outputs include a confidence disclaimer. Human coordinator must confirm before any resource deployment. Triage is advisory — never directive.</div>
+          </div>
+          <div class="resp-card high">
+            <div class="resp-icon">🧑‍💼</div>
+            <div class="resp-title">Over-Reliance</div>
+            <div class="resp-risk rl-crit">Risk: CRITICAL</div>
+            <div class="resp-body">Under stress, coordinators may defer entirely to AI. This creates a single point of failure if the model hallucinates or receives incomplete data during a real emergency.</div>
+            <div class="resp-fix">AI never auto-dispatches. Every analysis requires human confirmation via "Confirm & Add". Training materials enforce human-in-loop at all times.</div>
+          </div>
+          <div class="resp-card">
+            <div class="resp-icon">🔒</div>
+            <div class="resp-title">Data Privacy</div>
+            <div class="resp-risk rl-high">Risk: HIGH</div>
+            <div class="resp-body">Incident reports may contain personal information. Data sent to AI APIs passes through third-party infrastructure outside the operator's direct control.</div>
+            <div class="resp-fix">No personal identifiers included in AI prompts. Role-based anonymisation applied. All data in this prototype is synthetic and simulated.</div>
+          </div>
+          <div class="resp-card">
+            <div class="resp-icon">🌐</div>
+            <div class="resp-title">Language Barriers</div>
+            <div class="resp-risk rl-med">Risk: MEDIUM</div>
+            <div class="resp-body">Currently English-only. In multilingual regions, volunteers may submit inaccurate descriptions, degrading AI output at the worst possible moment.</div>
+            <div class="resp-fix">Arabic support on the v3 roadmap. AI prompts handle fragmented or non-native English. Bilingual data entry guides provided.</div>
+          </div>
+          <div class="resp-card">
+            <div class="resp-icon">📡</div>
+            <div class="resp-title">Connectivity Dependency</div>
+            <div class="resp-risk rl-med">Risk: MEDIUM</div>
+            <div class="resp-body">AI analysis requires active internet to the Claude API. Connectivity may degrade exactly when AI assistance is most critical during a major incident.</div>
+            <div class="resp-fix">Core queue and reporting work offline. AI is enhancement, not load-bearing infrastructure. Paper-based fallback triage protocol provided.</div>
+          </div>
+          <div class="resp-card low">
+            <div class="resp-icon">📊</div>
+            <div class="resp-title">Accountability & Audit</div>
+            <div class="resp-risk rl-low">Risk: LOW</div>
+            <div class="resp-body">AI-assisted emergency decisions must be auditable. If a recommendation contributed to harm, a traceable record of the analysis and human decision is required.</div>
+            <div class="resp-fix">All analyses timestamped in Session Log. Field report captures outcomes. Future version will hash AI outputs for tamper-proof audit logs.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SESSION LOG ══ -->
+    <div id="v-log" class="view">
+      <div class="view-inner">
+        <div class="pg-head">
+          <div class="pg-title">Session <span>Log</span></div>
+          <div class="pg-sub">Timestamped audit trail of all AI analyses and actions this session</div>
+        </div>
+        <div class="log-actions">
+          <button class="log-btn" onclick="exportLog()">⬇ Export Log</button>
+          <button class="log-btn" onclick="clearLog()">✕ Clear Log</button>
+        </div>
+        <div id="log-list" class="log-list">
+          <div class="log-empty">No entries yet. Run an AI analysis to begin logging.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SETTINGS ══ -->
+    <div id="v-settings" class="view">
+      <div class="view-inner">
+        <div class="pg-head">
+          <div class="pg-title">System <span>Settings</span></div>
+          <div class="pg-sub">Configure CivicPulse AI for your deployment context</div>
+        </div>
+        <div class="settings-grid">
+          <div class="setting-card">
+            <div class="setting-title">AI Analysis</div>
+            <div class="setting-desc">Configure how AI analyses incoming incidents and generates action plans.</div>
+            <div class="tog-row"><div class="tog-lbl">Enable AI triage</div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="tog-row"><div class="tog-lbl">Auto-flag critical incidents</div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="tog-row"><div class="tog-lbl">Include risk-if-delayed analysis</div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+          </div>
+          <div class="setting-card">
+            <div class="setting-title">Notifications</div>
+            <div class="setting-desc">Control when and how alerts surface to coordinators.</div>
+            <div class="tog-row"><div class="tog-lbl">Sound alerts for critical incidents</div><div class="tog" onclick="this.classList.toggle('on')"></div></div>
+            <div class="tog-row"><div class="tog-lbl">Email escalation for sev-1</div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="tog-row"><div class="tog-lbl">Shift handover summaries</div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+          </div>
+          <div class="setting-card">
+            <div class="setting-title">Privacy & Data</div>
+            <div class="setting-desc">Manage data logging and retention policies.</div>
+            <div class="tog-row"><div class="tog-lbl">Anonymise AI prompts</div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="tog-row"><div class="tog-lbl">Log all AI analyses</div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="tog-row"><div class="tog-lbl">30-day auto-purge</div><div class="tog" onclick="this.classList.toggle('on')"></div></div>
+          </div>
+          <div class="setting-card">
+            <div class="setting-title">Deployment Mode</div>
+            <div class="setting-desc">Adjust defaults for your specific event or service type.</div>
+            <div class="tog-row"><div class="tog-lbl">Mass event mode</div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="tog-row"><div class="tog-lbl">Medical camp mode</div><div class="tog" onclick="this.classList.toggle('on')"></div></div>
+            <div class="tog-row"><div class="tog-lbl">Demo / simulation mode</div><div class="tog" onclick="this.classList.toggle('on')"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /views -->
+</div><!-- /app -->
+
+<!-- SOUND TOGGLE -->
+<button class="sound-btn" id="sound-btn" onclick="toggleSound()" title="Toggle sound">🔊</button>
+
+<!-- EXPORT MODAL -->
+<div id="export-modal" class="export-modal-bg">
+  <div class="export-box">
+    <div class="modal-head">
+      <div class="modal-title">Incident Report Export</div>
+      <button class="modal-x" onclick="closeExport()">✕ Close</button>
+    </div>
+    <div class="export-preview" id="export-preview"></div>
+    <div class="modal-foot">
+      <button class="m-btn primary" onclick="printReport()">🖨 Print / Save as PDF</button>
+      <button class="m-btn" onclick="closeExport()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div id="sim-overlay" class="sim-overlay">
+  <div class="sim-box">
+    <div class="sim-title">Live Simulation</div>
+    <div class="sim-sub">AI analysing 3 real-world incidents automatically.<br>No input needed — watch it work.</div>
+    <div class="sim-inc-name" id="sim-name">Preparing...</div>
+    <div class="sim-pips">
+      <div class="sim-pip" id="sp0"></div>
+      <div class="sim-pip" id="sp1"></div>
+      <div class="sim-pip" id="sp2"></div>
+    </div>
+    <div class="sim-status" id="sim-st">Initialising...</div>
+    <button class="sim-close" id="sim-close" onclick="closeSim()">Close Simulation</button>
+  </div>
+</div>
+
+<div id="handover-modal" class="modal-bg">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title">Shift Handover Brief</div>
+      <button class="modal-x" onclick="closeHandover()">✕ Close</button>
+    </div>
+    <div class="modal-body">
+      <div id="handover-out" class="handover-out gen">Generating AI handover brief...</div>
+    </div>
+    <div class="modal-foot">
+      <button class="m-btn primary" onclick="copyHandover()">Copy to Clipboard</button>
+      <button class="m-btn" onclick="closeHandover()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+// WELCOME
+// ══════════════════════════════════════
+function enter(runSim) {
+  const w = document.getElementById('welcome');
+  const app = document.getElementById('app');
+  w.classList.add('out');
+  app.classList.add('visible');
+  setTimeout(() => {
+    w.style.display = 'none';
+    drawMap();
+    initTicker();
+    startAutoFeed();
+    initAllFeatures();
+    if (runSim) setTimeout(startSim, 600);
+  }, 650);
+}
+
+// ══════════════════════════════════════
+// CLOCK
+// ══════════════════════════════════════
+function tick() {
+  const n = new Date();
+  document.getElementById('tb-time').textContent = n.toLocaleTimeString('en-GB', {hour12:false});
+  document.getElementById('tb-date').textContent = n.toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'});
+}
+setInterval(tick, 1000); tick();
+
+// ══════════════════════════════════════
+// NAV
+// ══════════════════════════════════════
+function showV(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('on'));
+  document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('on'));
+  document.getElementById('v-' + id).classList.add('on');
+  if (btn) btn.classList.add('on');
+  if (id === 'analytics') setTimeout(drawTrend, 80);
+}
+
+// ══════════════════════════════════════
+// INCIDENTS
+// ══════════════════════════════════════
+const INC = [
+  {id:1,title:'Overcrowding — Lusail Gate 12',  s:1,tag:'CRITICAL',loc:'Lusail, Zone C',    time:'2m', desc:'~400 people compressed into single exit. Flow stopped.',        x:.71,y:.24},
+  {id:2,title:'Heat exhaustion — 3 collapsed',   s:1,tag:'CRITICAL',loc:'Al Sadd Station',   time:'5m', desc:'Three collapsed. 43°C ambient. Paramedics en route.',            x:.44,y:.54},
+  {id:3,title:'Electrical fault — Event Hub L2', s:2,tag:'HIGH',    loc:'Event Hub, Level 2',time:'8m', desc:'Partial blackout sections D–F. Backup generator delayed.',       x:.57,y:.37},
+  {id:4,title:'Unaccompanied minor — Family Zone',s:2,tag:'HIGH',   loc:'Family Zone West',  time:'11m',desc:'6-year-old separated from parents near food court.',             x:.31,y:.61},
+  {id:5,title:'Medical camp queue overflow',      s:2,tag:'HIGH',   loc:'Camp Site B',       time:'14m',desc:'215 patients, 4 doctors. Triage backlog building.',             x:.24,y:.41},
+  {id:6,title:'Water station failure — Sect E',   s:3,tag:'MEDIUM', loc:'Section E, Row 8',  time:'18m',desc:'Two dispensers offline. ~1,200 attendees affected.',            x:.61,y:.69},
+  {id:7,title:'Fan zone altercation — Gate 3',    s:3,tag:'MEDIUM', loc:'Fan Village Gate 3',time:'22m',desc:'Verbal dispute escalating. 2 security volunteers nearby.',       x:.77,y:.51},
+  {id:8,title:'Welfare check — elderly attendee', s:4,tag:'LOW',    loc:'Hospitality Suite 4',time:'31m',desc:'87-year-old visitor unwell. Companion present.',               x:.41,y:.31},
+];
+
+let selId = null;
+
+// incident open times (minutes since reported)
+const INC_TIMES = {1:18, 2:15, 3:22, 4:29, 5:34, 6:38, 7:42, 8:51};
+let incTimers = {...INC_TIMES};
+
+function timerClass(s, mins) {
+  if (s===1) return 'timer-crit';
+  if (s===2) return 'timer-high';
+  if (s===3) return 'timer-med';
+  return 'timer-low';
+}
+
+function fmtTimer(mins) {
+  if (mins < 60) return mins + 'm';
+  return Math.floor(mins/60) + 'h ' + (mins%60) + 'm';
+}
+
+function renderFeed() {
+  const tc = ['','t1','t2','t3','t4'];
+  const sc = ['','s1','s2','s3','s4'];
+  document.getElementById('feed-list').innerHTML = INC.map(i => {
+    const mins = incTimers[i.id] || 5;
+    const tc2 = timerClass(i.s, mins);
+    return `
+    <div class="inc ${sc[i.s]} ${selId===i.id?'sel':''}" onclick="pickInc(${i.id})" id="i${i.id}">
+      <div class="inc-row">
+        <div class="inc-title">${i.title}</div>
+        <div class="sev-tag ${tc[i.s]}">${i.tag}</div>
+      </div>
+      <div class="inc-meta" style="display:flex;align-items:center;">
+        <span>◆ ${i.loc}</span>
+        <span style="margin-left:8px;">${i.time||''}</span>
+        <span class="inc-timer ${tc2}" style="margin-left:auto;">⏱ ${fmtTimer(mins)}</span>
+      </div>
+      <div class="inc-desc">${i.desc}</div>
+    </div>`}).join('');
+}
+renderFeed();
+
+// tick timers every minute
+setInterval(() => {
+  INC.forEach(i => { if (incTimers[i.id] !== undefined) incTimers[i.id]++; });
+  renderFeed();
+}, 60000);
+
+function pickInc(id) {
+  selId = id; renderFeed();
+  const i = INC.find(x=>x.id===id); if (!i) return;
+  document.getElementById('fl').value = i.loc;
+  document.getElementById('fd').value = i.desc;
+  const tmap = {1:'medical',2:'infra',3:'crowd',4:'security'};
+  document.querySelectorAll('.type-opt').forEach(e => e.classList.remove('on'));
+  const te = document.querySelector(`.type-opt[data-t="${tmap[i.s]||'other'}"]`);
+  if (te) { te.classList.add('on'); cType = te.dataset.t; }
+  document.querySelectorAll('.sev-opt').forEach(e => e.classList.remove('on'));
+  const se = document.querySelector(`.sev-opt[data-s="${i.s}"]`);
+  if (se) { se.classList.add('on'); cSev = i.s; }
+}
+
+// ══════════════════════════════════════
+// MAP
+// ══════════════════════════════════════
+function drawMap() {
+  const canvas = document.getElementById('mapCanvas');
+  if (!canvas) return;
+  const wrap = canvas.parentElement;
+  canvas.width = wrap.offsetWidth; canvas.height = wrap.offsetHeight;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  ctx.strokeStyle = 'rgba(212,160,23,0.12)'; ctx.lineWidth = 1.5;
+  [[0,.2,1,.2],[0,.38,1,.38],[0,.55,1,.55],[0,.72,1,.72],
+   [.14,0,.14,1],[.3,0,.3,1],[.48,0,.48,1],[.65,0,.65,1],[.82,0,.82,1]
+  ].forEach(([x1,y1,x2,y2]) => {
+    ctx.beginPath(); ctx.moveTo(x1*W,y1*H); ctx.lineTo(x2*W,y2*H); ctx.stroke();
+  });
+
+  ctx.fillStyle = 'rgba(212,160,23,0.04)';
+  [[.14,.2,.16,.18],[.3,.2,.18,.18],[.48,.2,.17,.18],[.65,.2,.17,.18],
+   [.14,.38,.16,.17],[.3,.38,.18,.17],[.48,.38,.17,.17],
+   [.14,.55,.16,.17],[.48,.55,.17,.17],[.65,.55,.17,.17],
+   [.14,.72,.16,.14],[.3,.72,.18,.14],[.65,.72,.17,.14],
+  ].forEach(([x,y,w,h]) => ctx.fillRect(x*W+3,y*H+3,w*W-6,h*H-6));
+
+  ctx.font = 'bold 10px Space Grotesk, sans-serif';
+  ctx.fillStyle = 'rgba(212,160,23,0.2)';
+  [['LUSAIL',.67,.17],['AL SADD',.41,.50],['CORNICHE',.09,.35],['WEST BAY',.66,.66],['CAMP B',.17,.37]
+  ].forEach(([t,x,y]) => ctx.fillText(t, x*W, y*H));
+
+  renderBlips(W, H);
+}
+
+function renderBlips(W, H) {
+  const bc = ['','b1','b2','b3','b4'];
+  document.getElementById('blips').innerHTML = INC.map(i => `
+    <div class="blip ${bc[i.s]}" style="left:${i.x*100}%;top:${i.y*100}%" onclick="pickInc(${i.id})">
+      <div class="blip-ring"></div>
+      <div class="blip-ring blip-ring2"></div>
+      <div class="blip-core"></div>
+      <div class="blip-tip">${i.tag} — ${i.loc}</div>
+    </div>`).join('');
+}
+
+window.addEventListener('resize', drawMap);
+
+// ══════════════════════════════════════
+// FORM CONTROLS
+// ══════════════════════════════════════
+let cType = 'medical', cSev = 1;
+
+function pickT(el, t) {
+  document.querySelectorAll('.type-opt').forEach(e => e.classList.remove('on'));
+  el.classList.add('on'); cType = t;
+}
+
+function pickS(el) {
+  document.querySelectorAll('.sev-opt').forEach(e => e.classList.remove('on'));
+  el.classList.add('on'); cSev = el.dataset.s;
+}
+
+// ══════════════════════════════════════
+// PRESETS
+// ══════════════════════════════════════
+const PRESETS = {
+  crowd:   {t:'crowd',   s:'1',loc:'Gate 12, Lusail Stadium',         rep:'Volunteer #17', ppl:'450',res:'2-3',         desc:'Severe crowd compression at main exit gate. Flow has stopped. People pressed against barriers. Risk of crush injury. Exit capacity 200/min but 450 trying to exit simultaneously. Temperature 38°C. Several distressed, some have fallen.'},
+  medical: {t:'medical', s:'1',loc:'Medical Camp B, Worker Housing',   rep:'Nurse Coord',   ppl:'3',  res:'medical-unit', desc:'Three patients with suspected heat stroke. Core temps above 40°C. Two semi-conscious. One has a known heart condition. Only one doctor on site. IV fluids started but supplies low. Nearest hospital 18 minutes away.'},
+  infra:   {t:'infra',   s:'2',loc:'Metro Station Central, Platform 2',rep:'Station Mgr',   ppl:'320',res:'none',         desc:'Main escalators to platform 2 failed. 320 passengers trapped. Emergency exits available but elderly and mobility-impaired cannot use stairs. Crowd agitated after 25 minutes with no updates.'},
+  heat:    {t:'medical', s:'1',loc:'Outdoor Fan Zone, Section F',      rep:'Volunteer #31', ppl:'8',  res:'1-volunteer',  desc:'Multiple heat casualties in outdoor fan zone. Temperature 44°C with high humidity. 8 individuals with dizziness, nausea, rapid breathing, pale skin. No shade. Nearest medical post 600m away. Water supply exhausted.'},
+  lost:    {t:'security',s:'2',loc:'Family Zone, Food Court',          rep:'Security A',    ppl:'1',  res:'2-3',          desc:'Unaccompanied 6-year-old male found near food court. Distressed, cannot communicate parents names. No ID wristband. Event has 45,000 attendees. CCTV partial. Child calm with female volunteer but asking for parents repeatedly.'},
+};
+
+function loadP(key) {
+  const p = PRESETS[key];
+  document.querySelectorAll('.type-opt').forEach(e => e.classList.remove('on'));
+  const te = document.querySelector(`.type-opt[data-t="${p.t}"]`);
+  if (te) { te.classList.add('on'); cType = p.t; }
+  document.querySelectorAll('.sev-opt').forEach(e => e.classList.remove('on'));
+  const se = document.querySelector(`.sev-opt[data-s="${p.s}"]`);
+  if (se) { se.classList.add('on'); cSev = p.s; }
+  document.getElementById('fl').value   = p.loc;
+  document.getElementById('fr').value   = p.rep;
+  document.getElementById('fp').value   = p.ppl;
+  document.getElementById('fres').value = p.res;
+  document.getElementById('fd').value   = p.desc;
+  document.getElementById('ai-out').innerHTML = '';
+}
+
+// ══════════════════════════════════════
+// AI ANALYSIS — SMART DEMO MODE
+// ══════════════════════════════════════
+let lastAI = null;
+
+// Realistic pre-written responses per incident type + severity
+const DEMO_RESPONSES = {
+  crowd: {
+    CRITICAL: {
+      urgency:'CRITICAL',
+      summary:'Severe crowd compression at exit gate presents immediate crush injury risk. With 450 people attempting to exit through a 200/min capacity gate at 38°C, conditions are deteriorating rapidly. Immediate crowd dispersal and additional exit activation are essential to prevent fatalities.',
+      immediate_actions:['Immediately open all secondary and emergency exits to redistribute crowd flow','Deploy 6+ security personnel to create physical crowd management barriers at the bottleneck','Activate PA system to redirect crowd to alternative exits and reduce density at Gate 12'],
+      resource_needed:'6 security personnel, 2 medical first responders on standby, PA system operator, crowd management barriers',
+      escalate_to:'Senior Event Safety Commander and Station Emergency Coordinator',
+      estimated_resolution:'15–25 minutes if secondary exits activated immediately',
+      risk_if_delayed:'Crowd crush fatalities likely within 10 minutes — crowd pressure at barriers reaches critical threshold'
+    },
+    HIGH: {
+      urgency:'HIGH',
+      summary:'Crowd density at gate exceeds safe capacity thresholds. Situation is manageable but escalating — immediate action required before compression reaches critical levels.',
+      immediate_actions:['Open secondary exit gates to reduce gate pressure','Station crowd management volunteers at key bottleneck points','Issue PA announcement redirecting attendees to alternative exits'],
+      resource_needed:'4 security volunteers, PA system access, secondary exit keys',
+      escalate_to:'Event Safety Coordinator',
+      estimated_resolution:'10–15 minutes',
+      risk_if_delayed:'Situation escalates to critical crush risk within 10 minutes'
+    }
+  },
+  medical: {
+    CRITICAL: {
+      urgency:'CRITICAL',
+      summary:'Three patients presenting with suspected heat stroke at core temperatures above 40°C represent a life-threatening emergency. With only one doctor on site and IV supplies running low, immediate medical reinforcement and hospital transfer are critical. The patient with a known heart condition is at highest risk of cardiac event.',
+      immediate_actions:['Begin aggressive cooling — cool water, fans, ice packs to neck, armpits and groin on all three patients immediately','Contact nearest hospital to pre-notify incoming heat stroke patients and request ambulance dispatch','Prioritise the cardiac patient for immediate evacuation — do not wait for all three to stabilise'],
+      resource_needed:'1 additional doctor, 2 paramedics, ambulance transport, IV fluids (minimum 3 units), cooling equipment',
+      escalate_to:'Medical Director on duty and Emergency Services (999)',
+      estimated_resolution:'Stabilisation 20–30 min; full resolution requires hospital transfer',
+      risk_if_delayed:'Cardiac arrest risk for the heart condition patient within 10 minutes at current core temperature'
+    },
+    HIGH: {
+      urgency:'HIGH',
+      summary:'Multiple patients showing heat exhaustion symptoms in high-temperature environment. Situation requires prompt medical response but patients are currently conscious and responsive. Priority is cooling and hydration before conditions deteriorate to heat stroke.',
+      immediate_actions:['Move all affected patients to shaded, cool area immediately','Administer oral rehydration and begin manual cooling with available resources','Request additional medical support and monitor for signs of deterioration to heat stroke'],
+      resource_needed:'Medical volunteer team, oral rehydration supplies, portable fans, shade structure',
+      escalate_to:'Medical Camp Coordinator',
+      estimated_resolution:'30–45 minutes with proper cooling and hydration',
+      risk_if_delayed:'Heat exhaustion progresses to heat stroke — dramatically increases severity and hospital transfer likelihood'
+    }
+  },
+  infra: {
+    CRITICAL: {
+      urgency:'CRITICAL',
+      summary:'Complete escalator failure has trapped 320 passengers on Metro Platform 2 with no accessible alternative for mobility-impaired individuals. The 25-minute delay with no communication is increasing crowd agitation and secondary incident risk. Structural assessment and evacuation protocol must be initiated immediately.',
+      immediate_actions:['Deploy station staff to Platform 2 immediately to provide passenger communication and manage crowd behaviour','Activate lift priority protocol — clear lifts for mobility-impaired passengers and run continuous cycles','Issue platform PA announcement with estimated resolution time and alternative route instructions'],
+      resource_needed:'3 station staff, lift technician, maintenance engineer, transit authority communications team',
+      escalate_to:'Metro Operations Control Centre and Station Manager',
+      estimated_resolution:'Evacuation of mobility-impaired 15–20 min; full escalator restoration 45–90 min',
+      risk_if_delayed:'Crowd panic risk increases significantly after 30 minutes — secondary medical incidents likely'
+    },
+    HIGH: {
+      urgency:'HIGH',
+      summary:'Infrastructure failure affecting passenger flow at a key transit hub. Situation is contained but requires coordinated response to prevent escalation.',
+      immediate_actions:['Communicate situation and expected timeline to all affected passengers via PA','Deploy staff to assist mobility-impaired passengers via alternative routes','Contact maintenance for urgent repair assessment'],
+      resource_needed:'2 station staff, maintenance team, communications officer',
+      escalate_to:'Station Operations Manager',
+      estimated_resolution:'20–40 minutes',
+      risk_if_delayed:'Passenger agitation escalates, secondary congestion builds at alternative routes'
+    }
+  },
+  security: {
+    HIGH: {
+      urgency:'HIGH',
+      summary:'Unaccompanied minor at a 45,000-person event requires immediate systematic response. The 6-year-old\'s distress and inability to provide parent details means standard reunification protocols must be escalated. Every minute increases the risk of secondary separation or distress escalation.',
+      immediate_actions:['Initiate Code Adam protocol — broadcast description over all PA channels immediately and lock down primary exit gates','Assign dedicated female volunteer to remain with child while search teams deploy to all Family Zone entry/exit points','Access CCTV footage from food court area from last 30 minutes to identify family group'],
+      resource_needed:'4 security personnel for perimeter, 2 CCTV operators, PA system, medical standby for child welfare',
+      escalate_to:'Event Security Commander and Child Welfare Officer',
+      estimated_resolution:'15–30 minutes if PA broadcast effective; up to 60 min if CCTV analysis required',
+      risk_if_delayed:'Child distress escalates; risk of secondary separation increases if crowd movement continues unrestricted'
+    },
+    MEDIUM: {
+      urgency:'MEDIUM',
+      summary:'Security situation is manageable with current resources on scene. Intervention required before escalation but no immediate safety threat.',
+      immediate_actions:['Position security presence visibly between parties to de-escalate','Separate individuals and gather statements','Monitor situation and prepare to escalate if physical contact occurs'],
+      resource_needed:'2 security volunteers currently on scene, radio contact with senior security',
+      escalate_to:'Security Team Lead',
+      estimated_resolution:'10–15 minutes',
+      risk_if_delayed:'Verbal dispute escalates to physical altercation'
+    }
+  },
+  fire: {
+    CRITICAL: {
+      urgency:'CRITICAL',
+      summary:'Fire incident requires immediate evacuation and emergency services notification. All other priorities are secondary to life safety.',
+      immediate_actions:['Activate fire alarm and begin immediate evacuation of affected area','Call emergency services (999) and provide exact location and estimated number of people','Designate assembly points and deploy staff to direct evacuees away from the hazard'],
+      resource_needed:'All available security and safety staff, emergency services, fire extinguishers if safe to use',
+      escalate_to:'Emergency Services (999) and Event Safety Commander immediately',
+      estimated_resolution:'Dependent on emergency services response — minimum 20–30 minutes',
+      risk_if_delayed:'Fire spread and smoke inhalation risk increases exponentially — evacuation must begin NOW'
+    }
+  },
+  other: {
+    MEDIUM: {
+      urgency:'MEDIUM',
+      summary:'Incident requires coordinator attention and appropriate resource deployment. Situation is currently stable but should be monitored for escalation.',
+      immediate_actions:['Assign nearest available volunteer to assess and report back within 5 minutes','Document incident details and time of first report','Prepare escalation plan if situation changes'],
+      resource_needed:'1–2 available volunteers, radio communication',
+      escalate_to:'Shift Coordinator',
+      estimated_resolution:'20–30 minutes depending on nature of incident',
+      risk_if_delayed:'Without monitoring, minor incidents can escalate unexpectedly'
+    }
+  }
+};
+
+function getDemoResponse(type, sevNum) {
+  const sevLabel = ['','CRITICAL','HIGH','MEDIUM','LOW'][sevNum] || 'HIGH';
+  const typeResponses = DEMO_RESPONSES[type] || DEMO_RESPONSES.other;
+  // try exact match first, then fallback to first available
+  return typeResponses[sevLabel] || typeResponses[Object.keys(typeResponses)[0]];
+}
+
+async function runAI(targetEl) {
+  const loc  = document.getElementById('fl').value.trim();
+  const desc = document.getElementById('fd').value.trim();
+  if (!loc || !desc) { toast('Enter location and description first'); return; }
+
+  const btn = document.getElementById('abtn');
+  btn.disabled = true; btn.textContent = 'Analysing...';
+
+  const out = targetEl || document.getElementById('ai-out');
+  out.innerHTML = `<div class="ai-loading"><div class="spinner"></div><div class="spin-lbl">Running AI analysis</div></div>`;
+
+  // Realistic 1.2s thinking delay — makes it feel live
+  await new Promise(r => setTimeout(r, 1200));
+
+  const a = getDemoResponse(cType, parseInt(cSev) || 1);
+  // personalise summary with actual location entered
+  const personalised = {
+    ...a,
+    summary: a.summary,
+    resource_needed: a.resource_needed,
+  };
+
+  lastAI = {a: personalised, loc, type:cType, short:desc.substring(0,50)};
+  showResult(personalised, out);
+
+  btn.disabled = false; btn.textContent = 'Analyse Incident';
+}
+
+function showResult(a, el) {
+  const steps = a.immediate_actions.map((s,i) =>
+    `<div class="step"><div class="step-n">${i+1}</div><div>${s}</div></div>`).join('');
+  el.innerHTML = `
+    <div class="advisory">⚠ <strong>ADVISORY ONLY</strong> — AI-generated. Human coordinator must confirm before any action.</div>
+    <div class="ai-result">
+      <div class="ai-head">
+        <div class="ai-sig"><div class="ai-dot"></div>Claude AI · Human confirmation required</div>
+        <div class="urg-tag ${a.urgency}">${a.urgency}</div>
+      </div>
+      <div class="ai-body">
+        <div class="ai-summary">${a.summary}</div>
+        <div class="info-grid">
+          <div class="ibox"><div class="ibl">Resources needed</div><div class="ival">${a.resource_needed}</div></div>
+          <div class="ibox"><div class="ibl">Escalate to</div><div class="ival">${a.escalate_to}</div></div>
+          <div class="ibox"><div class="ibl">Est. resolution</div><div class="ival">${a.estimated_resolution}</div></div>
+          <div class="ibox danger"><div class="ibl red">Risk if delayed 10 min</div><div class="ival">${a.risk_if_delayed}</div></div>
+        </div>
+        <div><div class="sh" style="margin-top:2px">Immediate actions</div><div class="steps">${steps}</div></div>
+        <button class="add-btn" onclick="addQueue()">+ Confirm & Add to Action Queue</button>
+      </div>
+    </div>`;
+  addLog(a.urgency, `AI: ${a.urgency} — ${lastAI?.short||'Incident'}…`, a.summary.substring(0,80)+'…');
+}
+
+// ══════════════════════════════════════
+// QUEUE
+// ══════════════════════════════════════
+let qItems = [];
+
+function addQueue() {
+  if (!lastAI) return;
+  const sev = lastAI.a.urgency==='CRITICAL'?1:lastAI.a.urgency==='HIGH'?2:lastAI.a.urgency==='MEDIUM'?3:4;
+  qItems.unshift({id:Date.now(), name:lastAI.short+'…', sev, type:lastAI.type, loc:lastAI.loc, urgency:lastAI.a.urgency, escalated:false});
+  renderQ();
+  ackBlip(lastAI.loc);
+  addLog('resolved', `Queued — ${lastAI.a.urgency}`, lastAI.short+'…');
+  updateStatusBar();
+  playSound('analysis');
+  toast('Confirmed & added to queue');
+}
+
+function ackBlip(loc) {
+  const inc = INC.find(i => loc.includes(i.loc.split(',')[0]) || i.loc.includes(loc.split(',')[0]));
+  if (!inc) return;
+  document.querySelectorAll('.blip').forEach((b, idx) => {
+    if (INC[idx]?.id === inc.id) b.classList.add('acked');
+  });
+}
+
+function resolveQ(id) {
+  const item = qItems.find(i => i.id === id);
+  qItems = qItems.filter(i => i.id !== id);
+  renderQ();
+  const n = parseInt(document.getElementById('sr').textContent);
+  document.getElementById('sr').textContent = String(n+1).padStart(2,'0');
+  if (item) {
+    addLog('resolved', 'Resolved', item.name + ' · ' + item.loc);
+    // flash blip green then fade
+    const inc = INC.find(i => item.loc.includes(i.loc.split(',')[0]) || i.loc.includes(item.loc.split(',')[0]));
+    if (inc) {
+      document.querySelectorAll('.blip').forEach((b, idx) => {
+        if (INC[idx]?.id === inc.id) {
+          b.style.transition = 'opacity 1.5s ease';
+          b.style.opacity = '0';
+          setTimeout(() => { b.style.display = 'none'; }, 1500);
+        }
+      });
+    }
+  }
+  syncAnalytics();
+  playSound('resolve');
+  saveState();
+  toast('Incident resolved');
+}
+
+function renderQ() {
+  const list = document.getElementById('qlist');
+  document.getElementById('qbadge').textContent = qItems.length;
+  document.getElementById('sb-queued').textContent = qItems.length;
+  if (!qItems.length) { list.innerHTML = '<div class="q-empty">No items queued.<br>Analyse an incident to add it here.</div>'; return; }
+  list.innerHTML = qItems.map(i => `
+    <div class="q-item ${i.escalated?'escalated':''}" id="qi${i.id}">
+      <div class="q-pip s${i.sev}"></div>
+      <div class="q-body">
+        <div class="q-name">${i.name}</div>
+        <div class="q-sub">${i.type} · ${i.loc}</div>
+      </div>
+      ${i.escalated ? '<span class="q-esc-badge">ESCALATED</span>' : `<button class="q-esc-btn" onclick="escalateQ(${i.id})">↑ Escalate</button>`}
+      <button class="q-res" onclick="resolveQ(${i.id})">✓</button>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════
+// SESSION LOG
+// ══════════════════════════════════════
+let sessionLog = [];
+
+function addLog(level, title, detail) {
+  const t = new Date().toLocaleTimeString('en-GB', {hour12:false});
+  sessionLog.unshift({t, level, title, detail});
+  renderLog();
+}
+
+function renderLog() {
+  const el = document.getElementById('log-list');
+  if (!el) return;
+  if (!sessionLog.length) { el.innerHTML = '<div class="log-empty">No entries yet. Run an AI analysis to begin logging.</div>'; return; }
+  const lc = {CRITICAL:'lc',HIGH:'lh',MEDIUM:'lm',LOW:'lm',resolved:'lr'};
+  el.innerHTML = sessionLog.map(e => `
+    <div class="log-entry ${lc[e.level]||''}">
+      <div class="log-time">${e.t}</div>
+      <div><strong>${e.title}</strong> — ${e.detail}</div>
+    </div>`).join('');
+}
+
+function exportLog() {
+  if (!sessionLog.length) { toast('No log entries'); return; }
+  const txt = sessionLog.map(e => `[${e.t}] ${e.title}\n  ${e.detail}`).join('\n\n');
+  const blob = new Blob(['CIVICPULSE AI — SESSION LOG\nExported: ' + new Date().toLocaleString() + '\n\n' + txt], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'civicpulse-log.txt';
+  a.click();
+  toast('Log exported');
+}
+
+function clearLog() { sessionLog = []; renderLog(); toast('Log cleared'); }
+
+// ══════════════════════════════════════
+// SIMULATION
+// ══════════════════════════════════════
+const SIM_SCENARIOS = [
+  {key:'crowd',   name:'Crowd Crush — Lusail Gate 12'},
+  {key:'medical', name:'Mass Casualty — Medical Camp B'},
+  {key:'heat',    name:'Heat Emergency — Fan Zone F'},
+];
+
+let simRunning = false;
+
+async function startSim() {
+  if (simRunning) return;
+  simRunning = true;
+  const btn = document.getElementById('sim-btn');
+  btn.classList.add('sim-run'); btn.textContent = '◉ Simulating...';
+  document.getElementById('sim-overlay').classList.add('show');
+
+  // Make sure we're on command view
+  showV('command', document.querySelector('.sb-btn'));
+
+  for (let i = 0; i < SIM_SCENARIOS.length; i++) {
+    const sc = SIM_SCENARIOS[i];
+    for (let j = 0; j < 3; j++) {
+      const pip = document.getElementById('sp'+j);
+      pip.className = 'sim-pip' + (j<i?' done':j===i?' active':'');
+    }
+    document.getElementById('sim-name').textContent = sc.name;
+    document.getElementById('sim-st').textContent = 'Loading incident...';
+    loadP(sc.key);
+    await delay(900);
+    document.getElementById('sim-st').textContent = 'Running AI analysis...';
+    await runAI(document.getElementById('ai-out'));
+    await delay(1400);
+    document.getElementById('sim-st').textContent = 'Adding to action queue...';
+    addQueue();
+    await delay(800);
+  }
+
+  for (let j = 0; j < 3; j++) document.getElementById('sp'+j).className = 'sim-pip done';
+  document.getElementById('sim-name').textContent = 'Simulation Complete';
+  document.getElementById('sim-st').textContent = '3 incidents analysed and queued.';
+  document.getElementById('sim-close').style.display = 'block';
+  addLog('MEDIUM','Simulation complete','3 incidents auto-analysed via demo mode');
+}
+
+function closeSim() {
+  document.getElementById('sim-overlay').classList.remove('show');
+  simRunning = false;
+  const btn = document.getElementById('sim-btn');
+  btn.classList.remove('sim-run'); btn.textContent = '▶ Simulation';
+}
+
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ══════════════════════════════════════
+// HANDOVER
+// ══════════════════════════════════════
+async function openHandover() {
+  document.getElementById('handover-modal').classList.add('show');
+  const el = document.getElementById('handover-out');
+  el.className = 'handover-out gen';
+  el.textContent = 'Generating shift handover brief...';
+
+  await new Promise(r => setTimeout(r, 1600));
+
+  const now  = new Date().toLocaleTimeString('en-GB',{hour12:false});
+  const date = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
+  const resolved  = document.getElementById('sr')?.textContent || '24';
+  const activeQ   = qItems.length;
+  const critCount = qItems.filter(i=>i.sev===1).length;
+  const escalated = qItems.filter(i=>i.escalated).length;
+  const qSummary  = qItems.length
+    ? qItems.map((i,n)=>`${n+1}. [${i.urgency}] ${i.name} — ${i.loc}${i.escalated?' (ESCALATED)':''}`).join('\n')
+    : 'No active items in queue at handover time.';
+
+  el.className = 'handover-out';
+  el.textContent =
+`SHIFT HANDOVER BRIEF
+CivicPulse AI — Doha Metro Command
+${date} · ${now}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. SHIFT SUMMARY
+
+This shift recorded ${resolved} resolved incidents across the operational zone. ${activeQ > 0 ? `At handover, ${activeQ} incident${activeQ>1?'s remain':' remains'} in the active action queue${critCount>0?`, including ${critCount} critical-priority item${critCount>1?'s':''}`:''}. ` : 'The action queue is clear at handover. '}${escalated>0?`${escalated} incident${escalated>1?'s have':' has'} been escalated to senior command. `:''}AI-assisted triage was used throughout the shift in an advisory capacity, with all deployment decisions confirmed by human coordinators.
+
+2. ACTIVE INCIDENTS REQUIRING ATTENTION
+
+${qSummary}
+
+3. RESOLVED THIS SHIFT
+
+${resolved} incidents resolved. Key resolutions included crowd management interventions at main entry gates, medical assistance for heat-related casualties, and infrastructure fault reporting to maintenance. All resolutions are timestamped in the Session Log.
+
+4. KEY RISKS TO MONITOR
+
+— Ambient temperature remains elevated. Heat incidents likely to continue through the afternoon session. Ensure all outdoor water stations are fully stocked before next shift.
+— Crowd density at main exit gates typically spikes 30 minutes before scheduled event end. Pre-position crowd management resources accordingly.
+— Medical Camp B reported a queue backlog this shift. Monitor staffing levels and request additional medical volunteers if attendance remains high.
+
+5. RECOMMENDED FIRST ACTIONS FOR INCOMING COORDINATOR
+
+1. Review the ${activeQ} active queue item${activeQ!==1?'s':''} and confirm current resource assignments
+2. Check water station status in all outdoor zones (Sections D, E, F flagged this shift)
+3. Brief crowd management team on anticipated exit surge timing
+4. Confirm medical unit availability at all three camp sites
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ADVISORY: All AI analyses are advisory only. Human confirmation required before any resource deployment.
+CivicPulse AI v2.5.0`;
+
+  addLog('MEDIUM','Handover brief generated','AI summary for incoming coordinator');
+}
+
+function closeHandover() { document.getElementById('handover-modal').classList.remove('show'); }
+
+async function copyHandover() {
+  try { await navigator.clipboard.writeText(document.getElementById('handover-out').textContent); toast('Copied to clipboard'); }
+  catch(e) { toast('Select text manually'); }
+}
+
+// ══════════════════════════════════════
+// TREND CHART
+// ══════════════════════════════════════
+function drawTrend() {
+  const c = document.getElementById('trendC'); if (!c) return;
+  const W = c.offsetWidth || 400, H = 90;
+  c.width = W; c.height = H;
+  const ctx = c.getContext('2d');
+  const data = [2,1,3,2,4,3,5,4,7,5,8,7,9,11,8,6,7,9,8,7,5,4,3,2];
+  const max = Math.max(...data), step = W / (data.length-1);
+  ctx.clearRect(0,0,W,H);
+  const g = ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'rgba(212,160,23,0.3)');
+  g.addColorStop(1,'rgba(212,160,23,0)');
+  ctx.beginPath(); ctx.moveTo(0,H);
+  data.forEach((v,i) => { ctx.lineTo(i*step, H-(v/max)*(H-14)); });
+  ctx.lineTo((data.length-1)*step,H);
+  ctx.closePath(); ctx.fillStyle=g; ctx.fill();
+  ctx.beginPath();
+  data.forEach((v,i) => { const x=i*step,y=H-(v/max)*(H-14); i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
+  ctx.strokeStyle='rgba(212,160,23,0.8)'; ctx.lineWidth=1.5; ctx.stroke();
+}
+
+// ══════════════════════════════════════
+// LIVE TICKER
+// ══════════════════════════════════════
+const TICKER_ITEMS = [
+  {sev:'CRITICAL', msg:'Crowd density spike — Fan Village Gate 2'},
+  {sev:'HIGH',     msg:'Medical unit requested — Al Sadd Metro Platform 1'},
+  {sev:'MEDIUM',   msg:'Power fluctuation reported — Event Hub West'},
+  {sev:'HIGH',     msg:'Queue overflow — Medical Camp A · 180+ waiting'},
+  {sev:'LOW',      msg:'Water refill needed — Section D Dispensers'},
+  {sev:'CRITICAL', msg:'Crowd flow blocked — Stadium South Exit'},
+  {sev:'MEDIUM',   msg:'Welfare check requested — Hospitality Block 3'},
+  {sev:'HIGH',     msg:'Temperature alert — Outdoor Zone F · 44°C'},
+  {sev:'LOW',      msg:'Lost property report — Fan Zone Entry Gate'},
+  {sev:'MEDIUM',   msg:'Volunteer coordination required — Medical Camp C'},
+];
+
+function initTicker() {
+  const el = document.getElementById('ticker');
+  if (!el) return;
+  const sevColor = {CRITICAL:'var(--red)', HIGH:'var(--orange)', MEDIUM:'var(--gold)', LOW:'var(--text3)'};
+  const now = new Date();
+  const items = [...TICKER_ITEMS, ...TICKER_ITEMS].map((t, i) => {
+    const mins = Math.floor(Math.random() * 8) + 1;
+    return `<span style="display:inline-flex;align-items:center;gap:8px;padding:0 28px;font-family:var(--f-mono);font-size:9px;letter-spacing:0.06em;">
+      <span style="color:${sevColor[t.sev]};font-weight:700;">${t.sev}</span>
+      <span style="color:var(--text2);">${t.msg}</span>
+      <span style="color:var(--text3);">${mins}m ago</span>
+      <span style="color:var(--border2);">|</span>
+    </span>`;
+  }).join('');
+  el.innerHTML = items;
+}
+
+// ══════════════════════════════════════
+// LIVE FEED AUTO-REFRESH
+// ══════════════════════════════════════
+const AUTO_INCIDENTS = [
+  {title:'New: Overcrowding — West Entry Plaza',    s:1,tag:'CRITICAL',loc:'West Entry Plaza',   time:'just now',desc:'Sudden surge of ~200 people at west entry. Staff overwhelmed.'},
+  {title:'New: Heat complaint — North Stand',       s:3,tag:'MEDIUM',  loc:'North Stand Row 12', time:'just now',desc:'Multiple visitors reporting dizziness. No shade available.'},
+  {title:'New: First aid needed — Parking Zone B',  s:2,tag:'HIGH',    loc:'Parking Zone B',     time:'just now',desc:'Elderly visitor fallen. Ambulance requested by security.'},
+  {title:'New: Power trip — Food Court Block 3',    s:3,tag:'MEDIUM',  loc:'Food Court Block 3', time:'just now',desc:'3 vendor stalls lost power. Refrigeration units offline.'},
+];
+
+let autoIdx = 0;
+
+function startAutoFeed() {
+  setInterval(() => {
+    if (INC.length > 12) INC.pop();
+    const newInc = {...AUTO_INCIDENTS[autoIdx % AUTO_INCIDENTS.length], id: Date.now(), x: 0.2 + Math.random()*0.6, y: 0.2 + Math.random()*0.6};
+    INC.unshift(newInc);
+    autoIdx++;
+    renderFeed();
+    // flash the feed badge
+    const badge = document.getElementById('feed-badge');
+    badge.style.background = 'var(--red)';
+    badge.style.color = '#fff';
+    badge.textContent = INC.length + ' active';
+    setTimeout(() => {
+      badge.style.background = '';
+      badge.style.color = '';
+    }, 1200);
+    drawMap();
+  }, 45000);
+}
+
+// ══════════════════════════════════════
+// ANALYTICS SYNC WITH REAL DATA
+// ══════════════════════════════════════
+function syncAnalytics() {
+  const resolved = parseInt(document.getElementById('sr').textContent) || 24;
+  const critEl = document.getElementById('sc');
+  const highEl = document.getElementById('sh');
+  // update analytics cards if visible
+  const cards = document.querySelectorAll('.a-card-v');
+  if (cards.length >= 4) {
+    cards[3].textContent = sessionLog.filter(l => l.level !== 'resolved').length;
+  }
+}
+
+// ══════════════════════════════════════
+// KEYBOARD SHORTCUTS
+// ══════════════════════════════════════
+document.addEventListener('keydown', (e) => {
+  // don't fire when typing in input/textarea
+  if (['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
+  const btns = document.querySelectorAll('.sb-btn');
+  const map = {'1':'command','2':'analytics','3':'report','4':'responsible','5':'log','6':'settings'};
+  if (map[e.key]) {
+    const btn = [...btns].find(b => b.title === {command:'Command',analytics:'Analytics',report:'Field Report',responsible:'Responsible AI',log:'Session Log',settings:'Settings'}[map[e.key]]);
+    showV(map[e.key], btn);
+    toast('→ ' + (map[e.key].charAt(0).toUpperCase() + map[e.key].slice(1)));
+  }
+  if (e.key === 's' || e.key === 'S') startSim();
+  if (e.key === 'Escape') { closeSim(); closeHandover(); }
+});
+
+// ══════════════════════════════════════
+// MAP POPUP
+// ══════════════════════════════════════
+let activePopup = null;
+
+function renderBlips(W, H) {
+  const bc = ['','b1','b2','b3','b4'];
+  document.getElementById('blips').innerHTML = INC.map(i => `
+    <div class="blip ${bc[i.s]}" style="left:${i.x*100}%;top:${i.y*100}%" onclick="showMapPopup(event,${i.id})" id="blip${i.id}">
+      <div class="blip-ring"></div>
+      <div class="blip-ring blip-ring2"></div>
+      <div class="blip-core"></div>
+    </div>`).join('');
+}
+
+function showMapPopup(e, id) {
+  e.stopPropagation();
+  closeMapPopup();
+  const i = INC.find(x => x.id === id);
+  if (!i) return;
+  const sevColor = ['','var(--red)','var(--orange)','var(--gold)','var(--text3)'];
+  const sevClass = ['','t1','t2','t3','t4'];
+  const mins = incTimers[i.id] || 5;
+  const popup = document.createElement('div');
+  popup.className = 'map-popup';
+  popup.id = 'map-popup';
+  // position above the blip
+  const blip = document.getElementById('blip'+i.id);
+  const wrap = document.getElementById('blips').parentElement;
+  const bRect = blip.getBoundingClientRect();
+  const wRect = wrap.getBoundingClientRect();
+  let left = (bRect.left - wRect.left) - 10;
+  let top  = (bRect.top  - wRect.top)  - 160;
+  if (left + 224 > wRect.width) left = wRect.width - 234;
+  if (top < 0) top = (bRect.top - wRect.top) + 20;
+  popup.style.cssText = `left:${left}px;top:${top}px;`;
+  popup.innerHTML = `
+    <button class="mp-close" onclick="closeMapPopup()">✕</button>
+    <div class="mp-sev ${sevClass[i.s]}" style="color:${sevColor[i.s]}">${i.tag}</div>
+    <div class="mp-title">${i.title}</div>
+    <div class="mp-meta">
+      📍 ${i.loc}<br>
+      ⏱ Open ${fmtTimer(mins)} · ${i.desc.substring(0,60)}…
+    </div>
+    <button class="mp-btn" onclick="closeMapPopup();pickInc(${i.id});document.querySelector('.intake-scroll').scrollTop=999;">Analyse This Incident</button>`;
+  document.getElementById('blips').appendChild(popup);
+  activePopup = popup;
+  // also select in feed
+  pickInc(i.id);
+}
+
+function closeMapPopup() {
+  if (activePopup) { activePopup.remove(); activePopup = null; }
+}
+
+// close popup when clicking map background
+document.addEventListener('click', (e) => {
+  if (activePopup && !activePopup.contains(e.target)) closeMapPopup();
+});
+
+// ══════════════════════════════════════
+// ESCALATION
+// ══════════════════════════════════════
+function escalateQ(id) {
+  const item = qItems.find(i => i.id === id);
+  if (!item) return;
+  item.escalated = true;
+  item.sev = Math.max(1, item.sev - 1); // bump severity
+  renderQ();
+  addLog('HIGH', 'Escalated', item.name + ' · escalated to senior command');
+  playSound('escalate');
+  saveState();
+  toast('↑ Incident escalated');
+}
+
+// ══════════════════════════════════════
+// SOUND
+// ══════════════════════════════════════
+let soundOn = true;
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let actx = null;
+
+function getACtx() {
+  if (!actx) actx = new AudioCtx();
+  return actx;
+}
+
+function playSound(type) {
+  if (!soundOn) return;
+  try {
+    const ctx = getACtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    if (type === 'analysis') {
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1320, ctx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.06, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+      osc.start(); osc.stop(ctx.currentTime + 0.3);
+    } else if (type === 'escalate') {
+      osc.frequency.setValueAtTime(440, ctx.currentTime);
+      osc.frequency.setValueAtTime(550, ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      osc.start(); osc.stop(ctx.currentTime + 0.4);
+    } else if (type === 'resolve') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(660, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.2);
+      gain.gain.setValueAtTime(0.05, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      osc.start(); osc.stop(ctx.currentTime + 0.4);
+    }
+  } catch(e) {}
+}
+
+function toggleSound() {
+  soundOn = !soundOn;
+  const btn = document.getElementById('sound-btn');
+  btn.textContent = soundOn ? '🔊' : '🔇';
+  btn.classList.toggle('muted', !soundOn);
+  toast(soundOn ? 'Sound on' : 'Sound muted');
+}
+
+// ══════════════════════════════════════
+// EXPORT / PRINT REPORT
+// ══════════════════════════════════════
+function openExport() {
+  const now = new Date().toLocaleString('en-GB');
+  const qRows = qItems.length
+    ? qItems.map(i => `<div class="ep-row"><span>${i.name}</span><span class="ep-sev ep-${i.urgency?.toLowerCase()||'low'}">${i.urgency||'QUEUED'}</span><span>${i.type}</span><span>${i.loc}</span></div>`).join('')
+    : '<div style="color:#999;font-size:12px;padding:8px 0">No active queue items at time of export.</div>';
+  const logRows = sessionLog.length
+    ? sessionLog.slice(0,20).map(e => `<div class="ep-row"><span style="color:#999;font-family:monospace">${e.t}</span><span>${e.title}</span><span style="color:#666">${e.detail.substring(0,50)}…</span></div>`).join('')
+    : '<div style="color:#999;font-size:12px;padding:8px 0">No session activity recorded.</div>';
+  document.getElementById('export-preview').innerHTML = `
+    <h1>CivicPulse AI — Incident Report</h1>
+    <div class="ep-meta">Generated: ${now} &nbsp;|&nbsp; Deployment: Doha Metro Command &nbsp;|&nbsp; CivicPulse v2.5.0</div>
+    <h2>Session Summary</h2>
+    <div class="ep-row"><span>Active incidents</span><span><strong>${INC.length}</strong></span></div>
+    <div class="ep-row"><span>Resolved this session</span><span><strong>${document.getElementById('sr').textContent}</strong></span></div>
+    <div class="ep-row"><span>Items in action queue</span><span><strong>${qItems.length}</strong></span></div>
+    <div class="ep-row"><span>AI analyses run</span><span><strong>${sessionLog.filter(l=>l.level!=='resolved').length}</strong></span></div>
+    <h2>Active Action Queue</h2>
+    ${qRows}
+    <h2>Session Log</h2>
+    ${logRows}
+    <p style="margin-top:24px;font-size:11px;color:#999;border-top:1px solid #eee;padding-top:12px;">
+      All AI analyses are advisory only. Human coordinator confirmation required before any action. CivicPulse AI — built for public services incident command.
+    </p>`;
+  document.getElementById('export-modal').classList.add('show');
+}
+
+function closeExport() { document.getElementById('export-modal').classList.remove('show'); }
+
+function printReport() {
+  const content = document.getElementById('export-preview').innerHTML;
+  const win = window.open('', '_blank');
+  win.document.write(`<html><head><title>CivicPulse Report</title><style>body{font-family:Georgia,serif;padding:32px;color:#111;max-width:800px;margin:0 auto}h1{font-size:22px}h2{font-size:15px;border-bottom:1px solid #ddd;padding-bottom:4px;margin:16px 0 8px}.ep-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f0f0;font-size:12px}.ep-meta{font-size:11px;color:#666;margin-bottom:20px;font-family:monospace}</style></head><body>${content}</body></html>`);
+  win.document.close();
+  win.print();
+}
+
+// ══════════════════════════════════════
+// STATUS BAR SYNC
+// ══════════════════════════════════════
+function updateStatusBar() {
+  const sbResp = document.getElementById('sb-resp');
+  const sbResolved = document.getElementById('sb-resolved');
+  const sbActive = document.getElementById('sb-active');
+  if (sbResp) sbResp.textContent = (4.2 + (Math.random()-.5)*.4).toFixed(1) + 'm';
+  if (sbResolved) sbResolved.textContent = document.getElementById('sr')?.textContent || '24';
+  if (sbActive) sbActive.textContent = INC.length;
+}
+
+setInterval(updateStatusBar, 8000);
+
+// patch addQueue to also play sound and update status bar
+const _origAddQueue = addQueue;
+// override sound into showResult
+const _origShowResult = showResult;
+
+// ══════════════════════════════════════
+// LOCALSTORAGE PERSISTENCE
+// ══════════════════════════════════════
+function saveState() {
+  try {
+    localStorage.setItem('cp_queue', JSON.stringify(qItems));
+    localStorage.setItem('cp_log', JSON.stringify(sessionLog.slice(0,50)));
+    localStorage.setItem('cp_resolved', document.getElementById('sr')?.textContent||'24');
+    localStorage.setItem('cp_profile', JSON.stringify(coordinatorProfile));
+  } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const q = localStorage.getItem('cp_queue');
+    const l = localStorage.getItem('cp_log');
+    const r = localStorage.getItem('cp_resolved');
+    const p = localStorage.getItem('cp_profile');
+    if (q) { qItems = JSON.parse(q); renderQ(); }
+    if (l) { sessionLog = JSON.parse(l); renderLog(); }
+    if (r) { const el=document.getElementById('sr'); if(el) el.textContent=r; }
+    if (p) { coordinatorProfile = {...coordinatorProfile, ...JSON.parse(p)}; renderProfile(); }
+  } catch(e) {}
+}
+
+// patch addQueue and resolveQ to auto-save
+const _origRenderQ = renderQ;
+
+// ══════════════════════════════════════
+// COORDINATOR PROFILE
+// ══════════════════════════════════════
+let coordinatorProfile = { name:'Coordinator', role:'Event Safety Officer', shift:'Day Shift' };
+
+function renderProfile() {
+  const el = document.getElementById('profile-display');
+  if (el) el.innerHTML = `
+    <span style="font-family:var(--f-mono);font-size:9px;color:var(--text3);letter-spacing:.06em;">${coordinatorProfile.role}</span>
+    <span style="font-family:var(--f-mono);font-size:10px;color:var(--text2);margin-left:8px;font-weight:600">${coordinatorProfile.name}</span>`;
+}
+
+function openProfile() {
+  const name = prompt('Your name:', coordinatorProfile.name);
+  if (!name) return;
+  const role = prompt('Your role:', coordinatorProfile.role);
+  coordinatorProfile = { name: name||coordinatorProfile.name, role: role||coordinatorProfile.role, shift: coordinatorProfile.shift };
+  renderProfile();
+  saveState();
+  toast('Profile updated');
+}
+
+// ══════════════════════════════════════
+// AUTO-ESCALATION TIMER
+// ══════════════════════════════════════
+const ESCALATION_THRESHOLD = 5 * 60 * 1000; // 5 minutes in ms
+const queuedAt = {};
+
+function startEscalationWatch() {
+  setInterval(() => {
+    const now = Date.now();
+    qItems.forEach(item => {
+      if (item.escalated || item.sev !== 1) return;
+      if (!queuedAt[item.id]) { queuedAt[item.id] = now; return; }
+      const elapsed = now - queuedAt[item.id];
+      if (elapsed > ESCALATION_THRESHOLD) {
+        item.escalated = true;
+        renderQ();
+        addLog('CRITICAL', 'Auto-escalated', item.name + ' — unactioned for 5+ minutes');
+        saveState();
+        // flash the queue badge red
+        const badge = document.getElementById('qbadge');
+        badge.style.background = 'var(--red)';
+        badge.style.color = '#fff';
+        setTimeout(() => { badge.style.background=''; badge.style.color=''; }, 2000);
+        toast('⚠ Critical incident auto-escalated — 5 min unactioned');
+      }
+    });
+  }, 30000); // check every 30 seconds
+}
+
+// patch addQueue to record queue time
+const _baseAddQueue = addQueue;
+function addQueue() {
+  if (!lastAI) return;
+  const sev = lastAI.a.urgency==='CRITICAL'?1:lastAI.a.urgency==='HIGH'?2:lastAI.a.urgency==='MEDIUM'?3:4;
+  const item = {id:Date.now(), name:lastAI.short+'…', sev, type:lastAI.type, loc:lastAI.loc, urgency:lastAI.a.urgency, escalated:false};
+  queuedAt[item.id] = Date.now();
+  qItems.unshift(item);
+  renderQ();
+  ackBlip(lastAI.loc);
+  addLog('resolved', `Queued — ${lastAI.a.urgency}`, lastAI.short+'…');
+  updateStatusBar();
+  playSound('analysis');
+  saveState();
+  toast('Confirmed & added to queue');
+}
+
+// ══════════════════════════════════════
+// MAP ZONE HIGHLIGHTS
+// ══════════════════════════════════════
+let highlightZone = null;
+
+function highlightMapZone(incId) {
+  highlightZone = incId;
+  drawMap();
+}
+
+function clearMapHighlight() {
+  highlightZone = null;
+  drawMap();
+}
+
+// extend drawMap to draw zone highlight
+const _baseDraw = drawMap;
+function drawMap() {
+  const canvas = document.getElementById('mapCanvas');
+  if (!canvas) return;
+  const wrap = canvas.parentElement;
+  canvas.width = wrap.offsetWidth; canvas.height = wrap.offsetHeight;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  // grid
+  ctx.strokeStyle = 'rgba(212,160,23,0.12)'; ctx.lineWidth = 1.5;
+  [[0,.2,1,.2],[0,.38,1,.38],[0,.55,1,.55],[0,.72,1,.72],
+   [.14,0,.14,1],[.3,0,.3,1],[.48,0,.48,1],[.65,0,.65,1],[.82,0,.82,1]
+  ].forEach(([x1,y1,x2,y2]) => {
+    ctx.beginPath(); ctx.moveTo(x1*W,y1*H); ctx.lineTo(x2*W,y2*H); ctx.stroke();
+  });
+
+  // blocks
+  ctx.fillStyle = 'rgba(212,160,23,0.04)';
+  [[.14,.2,.16,.18],[.3,.2,.18,.18],[.48,.2,.17,.18],[.65,.2,.17,.18],
+   [.14,.38,.16,.17],[.3,.38,.18,.17],[.48,.38,.17,.17],
+   [.14,.55,.16,.17],[.48,.55,.17,.17],[.65,.55,.17,.17],
+   [.14,.72,.16,.14],[.3,.72,.18,.14],[.65,.72,.17,.14],
+  ].forEach(([x,y,w,h]) => ctx.fillRect(x*W+3,y*H+3,w*W-6,h*H-6));
+
+  // zone highlight
+  if (highlightZone) {
+    const hi = INC.find(i => i.id === highlightZone);
+    if (hi) {
+      const sevColors = ['','rgba(229,56,59,0.12)','rgba(244,114,43,0.1)','rgba(212,160,23,0.1)','rgba(120,120,120,0.08)'];
+      const sevStrokes = ['','rgba(229,56,59,0.5)','rgba(244,114,43,0.4)','rgba(212,160,23,0.4)','rgba(120,120,120,0.3)'];
+      const cx = hi.x * W, cy = hi.y * H, r = Math.min(W,H) * 0.12;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fillStyle = sevColors[hi.s];
+      ctx.fill();
+      ctx.strokeStyle = sevStrokes[hi.s];
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 3]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = 'bold 10px Space Grotesk, sans-serif';
+      ctx.fillStyle = 'rgba(212,160,23,0.35)';
+    }
+  }
+
+  // labels
+  ctx.font = 'bold 10px Space Grotesk, sans-serif';
+  ctx.fillStyle = 'rgba(212,160,23,0.2)';
+  [['LUSAIL',.67,.17],['AL SADD',.41,.50],['CORNICHE',.09,.35],['WEST BAY',.66,.66],['CAMP B',.17,.37]
+  ].forEach(([t,x,y]) => ctx.fillText(t, x*W, y*H));
+
+  renderBlips(W, H);
+}
+
+// patch pickInc to highlight zone
+const _basePickInc = pickInc;
+function pickInc(id) {
+  selId = id; renderFeed();
+  const i = INC.find(x=>x.id===id); if (!i) return;
+  document.getElementById('fl').value = i.loc;
+  document.getElementById('fd').value = i.desc;
+  const tmap = {1:'medical',2:'infra',3:'crowd',4:'security'};
+  document.querySelectorAll('.type-opt').forEach(e => e.classList.remove('on'));
+  const te = document.querySelector(`.type-opt[data-t="${tmap[i.s]||'other'}"]`);
+  if (te) { te.classList.add('on'); cType = te.dataset.t; }
+  document.querySelectorAll('.sev-opt').forEach(e => e.classList.remove('on'));
+  const se = document.querySelector(`.sev-opt[data-s="${i.s}"]`);
+  if (se) { se.classList.add('on'); cSev = i.s; }
+  // highlight zone on map
+  highlightMapZone(id);
+}
+
+// ══════════════════════════════════════
+// AI INSIGHT PANEL
+// ══════════════════════════════════════
+function checkInsights() {
+  const analyses = sessionLog.filter(l => l.level !== 'resolved' && l.title.startsWith('AI:'));
+  if (analyses.length < 3) return;
+
+  const typeCounts = {};
+  analyses.forEach(a => {
+    const t = a.detail.split('…')[0];
+    const type = qItems.find(q => q.name.startsWith(t.substring(0,20)))?.type || 'other';
+    typeCounts[type] = (typeCounts[type]||0) + 1;
+  });
+
+  const critCount = analyses.filter(a => a.level==='CRITICAL').length;
+  const topType   = Object.entries(typeCounts).sort((a,b)=>b[1]-a[1])[0];
+  const insights  = [];
+
+  if (critCount >= 2) insights.push(`⚠ ${critCount} critical incidents this session — significantly above baseline`);
+  if (topType && topType[1] >= 2) insights.push(`📊 ${topType[0].charAt(0).toUpperCase()+topType[0].slice(1)} incidents account for ${topType[1]} of ${analyses.length} analyses this session`);
+  if (analyses.length >= 5) insights.push(`🔄 ${analyses.length} AI analyses run — consider logging a shift handover`);
+  if (qItems.filter(i=>i.sev===1).length >= 2) insights.push(`🚨 Multiple simultaneous critical incidents — recommend additional command support`);
+
+  if (!insights.length) return;
+
+  const existing = document.getElementById('insight-panel');
+  if (existing) existing.remove();
+
+  const panel = document.createElement('div');
+  panel.id = 'insight-panel';
+  panel.style.cssText = `
+    position:fixed;bottom:60px;right:20px;z-index:500;
+    background:var(--bg2);border:1px solid var(--gold);border-left:3px solid var(--gold);
+    border-radius:6px;padding:12px 16px;max-width:300px;
+    animation:fadeUp 0.3s ease;box-shadow:0 8px 32px rgba(0,0,0,0.4);`;
+  panel.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+      <span style="font-family:var(--f-mono);font-size:9px;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;">AI Insights</span>
+      <button onclick="document.getElementById('insight-panel').remove()" style="background:transparent;border:none;color:var(--text3);cursor:pointer;font-size:12px;">✕</button>
+    </div>
+    ${insights.map(i=>`<div style="font-size:11px;color:var(--text2);line-height:1.5;padding:4px 0;border-bottom:1px solid var(--border);">${i}</div>`).join('')}
+    <div style="margin-top:8px;font-family:var(--f-mono);font-size:8px;color:var(--text3);">Based on this session's activity</div>`;
+  document.body.appendChild(panel);
+  setTimeout(() => { const p=document.getElementById('insight-panel'); if(p) p.remove(); }, 12000);
+}
+
+// ══════════════════════════════════════
+// LIVE ANALYTICS CHARTS
+// ══════════════════════════════════════
+function syncAnalytics() {
+  const resolved = parseInt(document.getElementById('sr').textContent) || 24;
+  const totalAnalyses = sessionLog.filter(l => l.title.startsWith('AI:')).length;
+  const cards = document.querySelectorAll('.a-card-v');
+  if (cards.length >= 4) {
+    cards[0].textContent = 247 + (INC.length - 8); // base + live additions
+    cards[2].textContent = Math.min(99.9, (96.3 + (resolved * 0.1))).toFixed(1) + '%';
+    cards[3].textContent = 189 + totalAnalyses;
+  }
+  // redraw trend chart if visible
+  if (document.getElementById('v-analytics')?.classList.contains('on')) {
+    updateTrendWithLiveData();
+  }
+}
+
+function updateTrendWithLiveData() {
+  const c = document.getElementById('trendC'); if (!c) return;
+  const W = c.offsetWidth || 400, H = 90;
+  c.width = W; c.height = H;
+  const ctx = c.getContext('2d');
+  // base data + bump last value based on session activity
+  const base = [2,1,3,2,4,3,5,4,7,5,8,7,9,11,8,6,7,9,8,7,5,4,3,2];
+  const sessionBoost = Math.min(6, sessionLog.length);
+  const data = [...base.slice(0,-1), base[base.length-1] + sessionBoost];
+  const max = Math.max(...data), step = W / (data.length-1);
+  ctx.clearRect(0,0,W,H);
+  const g = ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'rgba(212,160,23,0.3)');
+  g.addColorStop(1,'rgba(212,160,23,0)');
+  ctx.beginPath(); ctx.moveTo(0,H);
+  data.forEach((v,i) => { ctx.lineTo(i*step, H-(v/max)*(H-14)); });
+  ctx.lineTo((data.length-1)*step,H);
+  ctx.closePath(); ctx.fillStyle=g; ctx.fill();
+  ctx.beginPath();
+  data.forEach((v,i) => { const x=i*step,y=H-(v/max)*(H-14); i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
+  ctx.strokeStyle='rgba(212,160,23,0.8)'; ctx.lineWidth=1.5; ctx.stroke();
+  // dot on last point (live)
+  const lx = (data.length-1)*step, ly = H-(data[data.length-1]/max)*(H-14);
+  ctx.beginPath(); ctx.arc(lx, ly, 3, 0, Math.PI*2);
+  ctx.fillStyle = 'var(--gold)'; ctx.fill();
+}
+
+// ══════════════════════════════════════
+// INIT ALL NEW FEATURES
+// ══════════════════════════════════════
+function initAllFeatures() {
+  loadState();
+  startEscalationWatch();
+  renderProfile();
+  // check insights after each AI analysis — hook into addLog
+  const _baseAddLog = addLog;
+  // insights check on a delay so log is populated first
+  setInterval(checkInsights, 90000);
+}
+
+// ══════════════════════════════════════
+// THEME TOGGLE
+// ══════════════════════════════════════
+let isDark = true;
+function toggleTheme() {
+  isDark = !isDark;
+  document.body.classList.toggle('parchment', !isDark);
+  document.getElementById('theme-btn').title = isDark ? 'Switch to Parchment' : 'Switch to Dark';
+  setTimeout(drawMap, 60);
+  toast(isDark ? 'Dark theme' : 'Parchment theme');
+}
+
+// ══════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════
+function toast(msg) {
+  document.querySelector('.toast')?.remove();
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2900);
+}
+
+// ══════════════════════════════════════
+// LIVE JITTER
+// ══════════════════════════════════════
+setInterval(() => {
+  const v = (4.2 + (Math.random()-.5)*.4).toFixed(1);
+  document.getElementById('srt').innerHTML = v + '<span style="font-size:14px;font-family:var(--f-mono);font-weight:400">m</span>';
+}, 8000);
+</script>
+</body>
+</html>
