@@ -2869,6 +2869,7 @@ async function runAI(targetEl) {
 
   lastAI = {a: personalised, loc, type:cType, short:desc.substring(0,50)};
   showResult(personalised, out);
+  setTimeout(() => { out.scrollIntoView({behavior:'smooth', block:'start'}); }, 100);
 
   btn.disabled = false; btn.textContent = 'Analyse Incident';
 }
@@ -2880,7 +2881,7 @@ function showResult(a, el) {
     <div class="advisory">⚠ <strong>ADVISORY ONLY</strong> — AI-generated. Human coordinator must confirm before any action.</div>
     <div class="ai-result">
       <div class="ai-head">
-        <div class="ai-sig"><div class="ai-dot"></div>Claude AI · Human confirmation required</div>
+        <div class="ai-sig"><div class="ai-dot"></div>CivicPulse AI · Human confirmation required</div>
         <div class="urg-tag ${a.urgency}">${a.urgency}</div>
       </div>
       <div class="ai-body">
