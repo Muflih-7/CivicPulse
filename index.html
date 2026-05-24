@@ -2869,7 +2869,7 @@ async function runAI(targetEl) {
 
   lastAI = {a: personalised, loc, type:cType, short:desc.substring(0,50)};
   showResult(personalised, out);
-  setTimeout(() => { out.scrollIntoView({behavior:'smooth', block:'start'}); }, 100);
+    setTimeout(() => { out.scrollIntoView({behavior:'smooth', block:'start'}); }, 100);
 
   btn.disabled = false; btn.textContent = 'Analyse Incident';
 }
