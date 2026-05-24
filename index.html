@@ -5,10 +5,43 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CivicPulse AI</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.383.0/umd/lucide.min.js"></script>
 <style>
 /* ════════════════════════════════
-   TOKENS
+   LUCIDE ICONS
 ════════════════════════════════ */
+.ico {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.ico svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+.ico.sm svg { width: 13px; height: 13px; }
+.ico.lg svg { width: 20px; height: 20px; }
+.ico.xl svg { width: 24px; height: 24px; }
+
+.type-ico {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.type-ico svg {
+  width: 16px; height: 16px;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
 :root {
   --bg:       #0A0A0A;
   --bg2:      #111111;
@@ -91,13 +124,14 @@ html, body { height:100%; background:var(--bg); color:var(--text); font-family:v
   background:#000;
   display:flex; align-items:center; justify-content:center;
   transition:opacity 0.6s ease;
+  overflow-y:auto;
 }
 
 #welcome.out { opacity:0; pointer-events:none; }
 
 .w-inner {
   text-align:center;
-  padding:20px 24px 100px;
+  padding:20px 24px 80px;
   max-width:600px;
   width:100%;
 }
@@ -2198,12 +2232,24 @@ textarea { resize:vertical; min-height:72px; line-height:1.5; }
 
                 <div class="sh">Incident type</div>
                 <div class="type-grid">
-                  <div class="type-opt on" onclick="pickT(this,'medical')" data-t="medical"><span class="type-ico">🏥</span>Medical</div>
-                  <div class="type-opt" onclick="pickT(this,'crowd')"    data-t="crowd"><span class="type-ico">👥</span>Crowd</div>
-                  <div class="type-opt" onclick="pickT(this,'fire')"     data-t="fire"><span class="type-ico">🔥</span>Fire</div>
-                  <div class="type-opt" onclick="pickT(this,'infra')"    data-t="infra"><span class="type-ico">⚙️</span>Infra</div>
-                  <div class="type-opt" onclick="pickT(this,'security')" data-t="security"><span class="type-ico">🛡️</span>Security</div>
-                  <div class="type-opt" onclick="pickT(this,'other')"    data-t="other"><span class="type-ico">📋</span>Other</div>
+                  <div class="type-opt on" onclick="pickT(this,'medical')" data-t="medical">
+                    <span class="type-ico"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>Medical
+                  </div>
+                  <div class="type-opt" onclick="pickT(this,'crowd')" data-t="crowd">
+                    <span class="type-ico"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span>Crowd
+                  </div>
+                  <div class="type-opt" onclick="pickT(this,'fire')" data-t="fire">
+                    <span class="type-ico"><svg viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 01-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"/></svg></span>Fire
+                  </div>
+                  <div class="type-opt" onclick="pickT(this,'infra')" data-t="infra">
+                    <span class="type-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span>Infra
+                  </div>
+                  <div class="type-opt" onclick="pickT(this,'security')" data-t="security">
+                    <span class="type-ico"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>Security
+                  </div>
+                  <div class="type-opt" onclick="pickT(this,'other')" data-t="other">
+                    <span class="type-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>Other
+                  </div>
                 </div>
 
                 <div class="sh">Severity estimate</div>
@@ -2355,7 +2401,7 @@ textarea { resize:vertical; min-height:72px; line-height:1.5; }
             </div>
           </div>
           <button class="submit-btn" onclick="toast('Report submitted — ID #'+Math.floor(Math.random()*9000+1000))">Submit Report</button>
-          <button class="submit-btn" style="background:transparent;border:1px solid var(--border2);color:var(--text2);margin-left:10px;" onclick="openExport()">⬇ Export as PDF</button>
+          <button class="submit-btn" style="background:transparent;border:1px solid var(--border2);color:var(--text2);margin-left:10px;" onclick="openExport()">Export as PDF</button>
         </div>
       </div>
     </div>
@@ -2369,42 +2415,42 @@ textarea { resize:vertical; min-height:72px; line-height:1.5; }
         </div>
         <div class="resp-grid">
           <div class="resp-card high">
-            <div class="resp-icon">⚖️</div>
+            <div class="resp-icon ico xl"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
             <div class="resp-title">Algorithmic Bias</div>
             <div class="resp-risk rl-crit">Risk: CRITICAL</div>
             <div class="resp-body">AI triage may over- or under-prioritise incidents based on how they're described. Language quality and cultural phrasing can skew urgency scores unpredictably.</div>
             <div class="resp-fix">All AI outputs include a confidence disclaimer. Human coordinator must confirm before any resource deployment. Triage is advisory — never directive.</div>
           </div>
           <div class="resp-card high">
-            <div class="resp-icon">🧑‍💼</div>
+            <div class="resp-icon ico xl"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
             <div class="resp-title">Over-Reliance</div>
             <div class="resp-risk rl-crit">Risk: CRITICAL</div>
             <div class="resp-body">Under stress, coordinators may defer entirely to AI. This creates a single point of failure if the model hallucinates or receives incomplete data during a real emergency.</div>
             <div class="resp-fix">AI never auto-dispatches. Every analysis requires human confirmation via "Confirm & Add". Training materials enforce human-in-loop at all times.</div>
           </div>
           <div class="resp-card">
-            <div class="resp-icon">🔒</div>
+            <div class="resp-icon ico xl"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
             <div class="resp-title">Data Privacy</div>
             <div class="resp-risk rl-high">Risk: HIGH</div>
             <div class="resp-body">Incident reports may contain personal information. Data sent to AI APIs passes through third-party infrastructure outside the operator's direct control.</div>
             <div class="resp-fix">No personal identifiers included in AI prompts. Role-based anonymisation applied. All data in this prototype is synthetic and simulated.</div>
           </div>
           <div class="resp-card">
-            <div class="resp-icon">🌐</div>
+            <div class="resp-icon ico xl"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
             <div class="resp-title">Language Barriers</div>
             <div class="resp-risk rl-med">Risk: MEDIUM</div>
             <div class="resp-body">Currently English-only. In multilingual regions, volunteers may submit inaccurate descriptions, degrading AI output at the worst possible moment.</div>
             <div class="resp-fix">Arabic support on the v3 roadmap. AI prompts handle fragmented or non-native English. Bilingual data entry guides provided.</div>
           </div>
           <div class="resp-card">
-            <div class="resp-icon">📡</div>
+            <div class="resp-icon ico xl"><svg viewBox="0 0 24 24"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></div>
             <div class="resp-title">Connectivity Dependency</div>
             <div class="resp-risk rl-med">Risk: MEDIUM</div>
-            <div class="resp-body">AI analysis requires active internet to the Claude API. Connectivity may degrade exactly when AI assistance is most critical during a major incident.</div>
+            <div class="resp-body">AI analysis requires active internet. Connectivity may degrade exactly when AI assistance is most critical during a major incident.</div>
             <div class="resp-fix">Core queue and reporting work offline. AI is enhancement, not load-bearing infrastructure. Paper-based fallback triage protocol provided.</div>
           </div>
           <div class="resp-card low">
-            <div class="resp-icon">📊</div>
+            <div class="resp-icon ico xl"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
             <div class="resp-title">Accountability & Audit</div>
             <div class="resp-risk rl-low">Risk: LOW</div>
             <div class="resp-body">AI-assisted emergency decisions must be auditable. If a recommendation contributed to harm, a traceable record of the analysis and human decision is required.</div>
@@ -2422,8 +2468,8 @@ textarea { resize:vertical; min-height:72px; line-height:1.5; }
           <div class="pg-sub">Timestamped audit trail of all AI analyses and actions this session</div>
         </div>
         <div class="log-actions">
-          <button class="log-btn" onclick="exportLog()">⬇ Export Log</button>
-          <button class="log-btn" onclick="clearLog()">✕ Clear Log</button>
+          <button class="log-btn" onclick="exportLog()">Export Log</button>
+          <button class="log-btn" onclick="clearLog()">Clear Log</button>
         </div>
         <div id="log-list" class="log-list">
           <div class="log-empty">No entries yet. Run an AI analysis to begin logging.</div>
@@ -2486,7 +2532,7 @@ textarea { resize:vertical; min-height:72px; line-height:1.5; }
     </div>
     <div class="export-preview" id="export-preview"></div>
     <div class="modal-foot">
-      <button class="m-btn primary" onclick="printReport()">🖨 Print / Save as PDF</button>
+      <button class="m-btn primary" onclick="printReport()">Print / Save as PDF</button>
       <button class="m-btn" onclick="closeExport()">Close</button>
     </div>
   </div>
@@ -2869,7 +2915,7 @@ async function runAI(targetEl) {
 
   lastAI = {a: personalised, loc, type:cType, short:desc.substring(0,50)};
   showResult(personalised, out);
-    setTimeout(() => { out.scrollIntoView({behavior:'smooth', block:'start'}); }, 100);
+  setTimeout(() => { out.scrollIntoView({behavior:'smooth', block:'nearest'}); }, 150);
 
   btn.disabled = false; btn.textContent = 'Analyse Incident';
 }
@@ -3631,10 +3677,10 @@ function checkInsights() {
   const topType   = Object.entries(typeCounts).sort((a,b)=>b[1]-a[1])[0];
   const insights  = [];
 
-  if (critCount >= 2) insights.push(`⚠ ${critCount} critical incidents this session — significantly above baseline`);
-  if (topType && topType[1] >= 2) insights.push(`📊 ${topType[0].charAt(0).toUpperCase()+topType[0].slice(1)} incidents account for ${topType[1]} of ${analyses.length} analyses this session`);
-  if (analyses.length >= 5) insights.push(`🔄 ${analyses.length} AI analyses run — consider logging a shift handover`);
-  if (qItems.filter(i=>i.sev===1).length >= 2) insights.push(`🚨 Multiple simultaneous critical incidents — recommend additional command support`);
+  if (critCount >= 2) insights.push(`${critCount} critical incidents this session — significantly above baseline`);
+  if (topType && topType[1] >= 2) insights.push(`${topType[0].charAt(0).toUpperCase()+topType[0].slice(1)} incidents account for ${topType[1]} of ${analyses.length} analyses this session`);
+  if (analyses.length >= 5) insights.push(`${analyses.length} AI analyses run — consider logging a shift handover`);
+  if (qItems.filter(i=>i.sev===1).length >= 2) insights.push(`Multiple simultaneous critical incidents — recommend additional command support`);
 
   if (!insights.length) return;
 
